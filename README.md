@@ -1,5 +1,12 @@
 # WIP - Not working (ETA medio October)
 
+* [Install](#user-content-install)
+* [Usage](#user-content-usage)
+  * [Copy single object](#user-content-copy-single-object)
+  * [Copy whole library](#user-content-copy-whole-library)
+  * [Restoring from backup](#user-content-restoring-from-backup)
+* [Config Files](#user-content-config-files)
+
 
 # zipSeries CLI
 
@@ -47,21 +54,21 @@ Make sure that ~/bin is in your `$PATH` variable:
 
 ## Usage:
 
-**Copy single object:**
+###Copy single object:
 
 	# You will be prompted with password
 	zipSeries \
 		--source-srv=server1 --source-usr=QSECOFR --source-libl=MYLIB --source-obj=MYOBJ \
 		--target-srv=server2 --target-usr=QSECOFR --target-libl=MYLIB
 
-**Copy whole library:**
+###Copy whole library:
 
 	# You will be prompted with password
 	zipSeries \
 		--source-srv=server1 --source-usr=QSECOFR --source-libl=MYLIB \
 		--target-srv=server2 --target-usr=QSECOFR --target-libl=MYLIB
 
-**Making backup:**
+###Making backup:
 
 By specifying `--target-save-file=file.zs4` you can take local backups
 
@@ -70,7 +77,7 @@ By specifying `--target-save-file=file.zs4` you can take local backups
 		--source-srv=server1 --source-usr=QSECOFR --source-libl=MYLIB --source-obj=MYOBJ \
 		--target-save-file=~/my_save_file.zs4
 
-**Restoring from backup:**
+###Restoring from backup:
 
 By specifying `--source-save-file=file.zs4` you can restore from a local backup
 

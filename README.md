@@ -1,3 +1,6 @@
+# WIP - Not working (ETA medio October)
+
+
 # zipSeries CLI
 
 Copy libraries / objects from one iSeries (AS/400) to another running the same (or lower) release of OS/400 as the source machine

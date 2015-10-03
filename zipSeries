@@ -5,6 +5,7 @@
 # Released under the MIT license
 #
 # Written by Andreas Louv <and@sitemule.com>
+
 VERSION = '1.2.6'
 
 import sys
@@ -25,48 +26,47 @@ class color:
 	END = '\033[0m'
 
 def writeVersion():
-	print '                             ' + color.UNDERLINE + 'zipSeries ' + VERSION + color.END + '                             '
+	print 'zipSeries ' + VERSION
 	print ''
-	print color.CYAN + '             Copyright (C) 2015 System & Method A/S Denmark              ' + color.END
-	print color.CYAN + '                     Released under the MIT license                      ' + color.END
+	print 'Copyright (C) 2015 System & Method A/S Denmark'
+	print 'Released under the MIT license'
 	print ''
-	print color.CYAN + '               Written by Andreas Louv <and@sitemule.com>                ' + color.END
+	print 'Written by Andreas Louv <and@sitemule.com>'
 
 def writeHelp():
 
-	writeVersion()
+	print 'usage: zipSeries [--version] [--help] [OPTION]...'
 	print ''
-	print 'Usage zipSeries [OPTION]...'
 	print 'Copy libraries / objects from one iSeries (AS/400) to another running'
 	print '  the same (or lower) release of OS/400 as source.'
 	print ''
 	print 'Mandatory arguments to long options are mandatory for short options too.'
 
 	# Source Help
-	print '  -s, --source-srv ' + color.UNDERLINE + 'server' + color.END + '           set server for the source'
-	print '  -u, --source-usr ' + color.UNDERLINE + 'user' + color.END + '             set user profile for the source'
-	print '  -p, --source-pwd ' + color.UNDERLINE + 'password' + color.END + '         set user password for the source'
-	print '  -l, --source-libl ' + color.UNDERLINE + 'library' + color.END + '         set library for the source'
-	print '  -o, --source-obj ' + color.UNDERLINE + 'object' + color.END + '           set oject for the source'
-	print '                                      leave blank if whole library is saved'
-	print '  -c, --source-config ' + color.UNDERLINE + 'config' + color.END + '        use file to set source config'
-	print '      --source-save-file ' + color.UNDERLINE + 'file.sav' + color.END + '   save OS/400 savfile locally'
-	print '                                      all other source options will ignored '
-	print '                                      if this option is set'
+	print '  -s, --source-srv=[server]       set server for the source'
+	print '  -u, --source-usr=[user]         set user profile for the source'
+	print '  -p, --source-pwd=[password]     set user password for the source'
+	print '  -l, --source-libl=[library]     set library for the source'
+	print '  -o, --source-obj=[object]       set oject for the source'
+	print '                                  leave blank if whole library is saved'
+	print '  -c, --source-config=[config]    use file to set source config'
+	print '      --source-save-file=[file]   save OS/400 savfile locally'
+	print '                                    all other --source-* options will ignored '
+	print '                                    if this option is set'
 	print ''
 	# Target Help
-	print '  -S, --target-srv ' + color.UNDERLINE + 'server' + color.END + '           set server for the target'
-	print '  -U, --target-usr ' + color.UNDERLINE + 'user' + color.END + '             set user profile for the target'
-	print '  -P, --target-pwd ' + color.UNDERLINE + 'password' + color.END + '         set user password for the target'
-	print '  -L, --target-libl ' + color.UNDERLINE + 'library' + color.END + '         set library for the target'
-	print '  -C, --target-config ' + color.UNDERLINE + 'config' + color.END + '        use file to set source config'
-	print '      --target-save-file ' + color.UNDERLINE + 'file.sav' + color.END + '   save OS/400 savfile locally'
-	print '                                      all other target options will ignored '
-	print '                                      if this option is set'
+	print '  -S, --target-srv=[server]       set server for the target'
+	print '  -U, --target-usr=[user]         set user profile for the target'
+	print '  -P, --target-pwd=[password]     set user password for the target'
+	print '  -L, --target-libl=[library]     set library for the target'
+	print '  -C, --target-config=[config]    use file to set target config'
+	print '      --target-save-file=[file]   restore from OS/400 savfile stored locally'
+	print '                                    all other --target-* options will ignored '
+	print '                                    if this option is set'
 	print ''
 	# Othet Help
-	print '      --help                        display this help and exit'
-	print '      --version                     output version information and exit'
+	print '      --help                      display this help and exit'
+	print '      --version                   output version information and exit'
 
 def readConfigFile(config, file, sudo=False):
 	cmd = ['cat', file]
@@ -147,9 +147,19 @@ def processArgv(argv):
 			writeVersion()
 			sys.exit(0)
 		else:
-			no_gate = (len(argv) == 0)
-			if not no_gate:
+			no_gate = False
+			if gate[:2] == '--':
+				if '=' in gate:
+					arg = gate[gate.index('=')+1:]
+					gate = gate[:gate.index('=')]
+				else:
+					sys.stderr.write('zipSeries missing value for option -- \'' + color.BOLD + gate + color.END + '\'\n')
+					sys.exit(1)
+			else:
 				arg = argv.pop(0)
+				no_gate = (len(argv) == 0)
+			
+			if not no_gate:
 				# Source Config
 				if gate == '--source-srv' or gate == '-s':
 					config['source']['srv'] = arg
@@ -194,24 +204,24 @@ def checkConfig(config):
 	# Source Config
 	if config['source']['save-file'] == '':
 		if config['source']['srv'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-srv ' + color.UNDERLINE + 'server' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-srv=server' + color.END + '\'\n')
 			sys.exit(1)
 		if config['source']['libl'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-l, --source-libl ' + color.UNDERLINE + 'library' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-l, --source-libl=library' + color.END + '\'\n')
 			sys.exit(1)
 		if config['source']['usr'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr ' + color.UNDERLINE + 'user' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr=user' + color.END + '\'\n')
 			sys.exit(1)
 
 	if config['target']['save-file'] == '':
 		if config['target']['srv'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-srv ' + color.UNDERLINE + 'server' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-srv=server' + color.END + '\'\n')
 			sys.exit(1)
 		if config['target']['libl'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-L, --target-libl ' + color.UNDERLINE + 'library' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-L, --target-libl=library' + color.END + '\'\n')
 			sys.exit(1)
 		if config['target']['usr'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-U, --target-usr ' + color.UNDERLINE + 'user' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-U, --target-usr=user' + color.END + '\'\n')
 			sys.exit(1)
 
 class AS400:

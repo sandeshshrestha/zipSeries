@@ -1,11 +1,11 @@
 # WIP - Not working (ETA medio October)
 
-* [Install](#user-content-install)
-* [Usage](#user-content-usage)
-  * [Copy single object](#user-content-copy-single-object)
-  * [Copy whole library](#user-content-copy-whole-library)
-  * [Restoring from backup](#user-content-restoring-from-backup)
-* [Config Files](#user-content-config-files)
+* [Install](#install)
+* [Usage](#usage)
+  * [Copy single object](#copy-single-object)
+  * [Copy whole library](#copy-whole-library)
+  * [Restoring from backup](#restoring-from-backup)
+* [Config Files](#config-files)
 
 
 # zipSeries CLI

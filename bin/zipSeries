@@ -1,0 +1,258 @@
+#!/usr/bin/python
+
+# zipSeries 1.2.6
+# Copyright (C) 2015 System & Method A/S Denmark
+# Released under the MIT license
+#
+# Written by Andreas Louv <and@sitemule.com>
+VERSION = '1.2.6'
+
+import sys
+import subprocess
+import getpass
+import uuid
+
+class color:
+	PURPLE = '\033[95m'
+	CYAN = '\033[96m'
+	DARKCYAN = '\033[36m'
+	BLUE = '\033[94m'
+	GREEN = '\033[92m'
+	YELLOW = '\033[93m'
+	RED = '\033[91m'
+	BOLD = '\033[1m'
+	UNDERLINE = '\033[4m'
+	END = '\033[0m'
+
+def writeVersion():
+	print '                             ' + color.UNDERLINE + 'zipSeries ' + VERSION + color.END + '                             '
+	print ''
+	print color.CYAN + '             Copyright (C) 2015 System & Method A/S Denmark              ' + color.END
+	print color.CYAN + '                     Released under the MIT license                      ' + color.END
+	print ''
+	print color.CYAN + '               Written by Andreas Louv <and@sitemule.com>                ' + color.END
+
+def writeHelp():
+
+	writeVersion()
+	print ''
+	print 'Usage zipSeries [OPTION]...'
+	print 'Copy libraries / objects from one iSeries (AS/400) to another running'
+	print '  the same (or lower) release of OS/400 as source.'
+	print ''
+	print 'Mandatory arguments to long options are mandatory for short options too.'
+
+	# Source Help
+	print '  -s, --source-srv ' + color.UNDERLINE + 'server' + color.END + '           set server for the source'
+	print '  -u, --source-usr ' + color.UNDERLINE + 'user' + color.END + '             set user profile for the source'
+	print '  -p, --source-pwd ' + color.UNDERLINE + 'password' + color.END + '         set user password for the source'
+	print '  -l, --source-libl ' + color.UNDERLINE + 'library' + color.END + '         set library for the source'
+	print '  -o, --source-obj ' + color.UNDERLINE + 'object' + color.END + '           set oject for the source'
+	print '                                      leave blank if whole library is saved'
+	print '  -c, --source-config ' + color.UNDERLINE + 'config' + color.END + '        use file to set source config'
+	print '      --source-save-file ' + color.UNDERLINE + 'file.sav' + color.END + '   save OS/400 savfile locally'
+	print '                                      all other source options will ignored '
+	print '                                      if this option is set'
+	print ''
+	# Target Help
+	print '  -S, --target-srv ' + color.UNDERLINE + 'server' + color.END + '           set server for the target'
+	print '  -U, --target-usr ' + color.UNDERLINE + 'user' + color.END + '             set user profile for the target'
+	print '  -P, --target-pwd ' + color.UNDERLINE + 'password' + color.END + '         set user password for the target'
+	print '  -L, --target-libl ' + color.UNDERLINE + 'library' + color.END + '         set library for the target'
+	print '  -C, --target-config ' + color.UNDERLINE + 'config' + color.END + '        use file to set source config'
+	print '      --target-save-file ' + color.UNDERLINE + 'file.sav' + color.END + '   save OS/400 savfile locally'
+	print '                                      all other target options will ignored '
+	print '                                      if this option is set'
+	print ''
+	# Othet Help
+	print '      --help                        display this help and exit'
+	print '      --version                     output version information and exit'
+
+def readConfigFile(config, file, sudo=False):
+	cmd = ['cat', file]
+
+	if sudo:
+		cmd.insert(0, 'sudo')
+
+	try:
+		f_config = subprocess.check_output(cmd, stderr=subprocess.STDOUT).splitlines()
+
+	except Exception, e:
+		if not sudo:
+			return readConfigFile(config, file, True)
+		else:
+			sys.stderr.write('zipSeries: cannot open \'' + color.BOLD + file + color.END + '\' for reading: No such file or directory\n')
+			sys.exit(0)
+
+	parseConfigFile(config, file, f_config)
+
+def parseConfigFile(config, file, f_config):
+	for i, line in enumerate(f_config):
+		line = line.strip()
+		# Allow empty lines
+		if line == '':
+			continue
+
+		msg = line
+
+		if ' ' in line:
+			split_index = line.index(' ')
+			key = line[0:split_index]
+			value = line[split_index+1:]
+
+			if key in ['srv', 'usr', 'pwd', 'libl', 'obj']:
+				config[key] = value
+				continue
+			else:
+				msg = 'Key not recornized: \'' + color.BOLD + key + color.END + '\''
+
+		# Fallthough to error print
+		sys.stderr.write('zipSeries: Cannot parse \'' + color.BOLD + file + color.END + '\':\n')
+		sys.stderr.write('Line (' + str(i+1) + '): ' + msg + '\n')
+		sys.exit(1)
+
+def processArgv(argv):
+	config = {
+		'source': {
+			'srv': '',
+			'usr': '',
+			'pwd': '',
+			'libl': '',
+			'obj': '',
+			'save-file': ''
+		},
+		'target': {
+			'srv': '',
+			'usr': '',
+			'pwd': '',
+			'libl': '',
+			'save-file': ''
+		}
+	}
+
+	gate = None
+
+	while len(argv):
+		arg = argv.pop(0)
+		if arg[0] == '-':
+			gate = arg
+
+		if gate == None:
+			sys.stderr.write('Try \'' + color.BOLD + 'zipSeries --help' + color.END + '\' for more information.\n')
+			sys.exit(1)
+		elif gate == '--help':
+			writeHelp()
+			sys.exit(0)
+		elif gate == '--version':
+			writeVersion()
+			sys.exit(0)
+		else:
+			no_gate = (len(argv) == 0)
+			if not no_gate:
+				arg = argv.pop(0)
+				# Source Config
+				if gate == '--source-srv' or gate == '-s':
+					config['source']['srv'] = arg
+				elif gate == '--source-usr' or gate == '-u':
+					config['source']['usr'] = arg
+				elif gate == '--source-pwd' or gate == '-p':
+					config['source']['pwd'] = arg
+				elif gate == '--source-libl' or gate == '-l':
+					config['source']['libl'] = arg
+				elif gate == '--source-obj' or gate == '-o':
+					config['source']['obj'] = arg
+				elif gate == '--source-config' or gate == '-c':
+					readConfigFile(config['source'], '/etc/zipSeries/' + arg + '.conf')
+				elif gate == '--source-save-file':
+					config['source']['save-file'] = arg
+				# Target Config
+				elif gate == '--target-srv' or gate == '-S':
+					config['target']['srv'] = arg
+				elif gate == '--target-usr' or gate == '-U':
+					config['target']['usr'] = arg
+				elif gate == '--target-pwd' or gate == '-P':
+					config['target']['pwd'] = arg
+				elif gate == '--target-libl' or gate == '-L':
+					config['target']['libl'] = arg
+				elif gate == '--target-config' or gate == '-C':
+					readConfigFile(config['target'], '/etc/zipSeries/' + arg + '.conf')
+				elif gate == '--target-save-file':
+					config['target']['save-file'] = arg
+				else:
+					no_gate = True
+
+			if no_gate:
+				sys.stderr.write('zipSeries: invalid option -- \'' + color.BOLD + (gate[2:] if gate[:2] == '--' else gate[1:]) + color.END + '\'\n')
+				sys.stderr.write('Try \'' + color.BOLD + 'zipSeries --help' + color.END + '\' for more information.\n')
+				sys.exit(1)
+
+			gate = None
+
+	return config
+
+def checkConfig(config):
+	# Source Config
+	if config['source']['save-file'] == '':
+		if config['source']['srv'] == '':
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-srv ' + color.UNDERLINE + 'server' + color.END + '\'\n')
+			sys.exit(1)
+		if config['source']['libl'] == '':
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-l, --source-libl ' + color.UNDERLINE + 'library' + color.END + '\'\n')
+			sys.exit(1)
+		if config['source']['usr'] == '':
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr ' + color.UNDERLINE + 'user' + color.END + '\'\n')
+			sys.exit(1)
+
+	if config['target']['save-file'] == '':
+		if config['target']['srv'] == '':
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-srv ' + color.UNDERLINE + 'server' + color.END + '\'\n')
+			sys.exit(1)
+		if config['target']['libl'] == '':
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-L, --target-libl ' + color.UNDERLINE + 'library' + color.END + '\'\n')
+			sys.exit(1)
+		if config['target']['usr'] == '':
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-U, --target-usr ' + color.UNDERLINE + 'user' + color.END + '\'\n')
+			sys.exit(1)
+
+class AS400:
+	def __init__(self, config):
+		self.source = config['source']
+		self.target = config['target']
+
+	def save(self):
+		save_file = ('/tmp/zipSeries-' + str(uuid.uuid1()) + '.sav') if self.target['save-file'] == '' else self.target['save-file'];
+
+		print save_file
+
+		self.source['save-file'] = save_file
+
+
+	def restore(self, file):
+		print self.target
+
+def main(argv):
+
+	config = processArgv(argv)
+
+	checkConfig(config)
+
+	as400 = AS400(config)
+	if config['source']['save-file'] == '':
+		if config['source']['pwd'] == '':
+			config['source']['pwd'] = getpass.getpass('Enter source user password: ')
+		try:
+			as400.save()
+		except Exception, e:
+			sys.stderr.write('zipSeries: Error happened while making savefile:\n');
+			sys.exit(1)
+
+	if config['target']['save-file'] == '':
+		if config['target']['pwd'] == '':
+			config['target']['pwd'] = getpass.getpass('Enter target user password: ')
+		try:
+			as400.restore(config['source']['save-file'])
+		except Exception, e:
+			sys.stderr.write('zipSeries: Error happened while restoring savefile:\n');
+			sys.exit(1)
+
+main(sys.argv[1:])

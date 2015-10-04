@@ -69,7 +69,9 @@ def writeHelp():
 	print '  -v, --verbose                   be more verbose/talkative during the operation.'
 	print '      --version                   output version information and exit'
 
-def readConfigFile(config, file, sudo=False):
+# readConfigFile will call itself again with the sudo=True argument,
+#   this is so we will only run as sudo if necessary.
+def readConfigFile(config, l_config, file, sudo=False):
 	cmd = ['cat', file]
 
 	if sudo:
@@ -80,29 +82,40 @@ def readConfigFile(config, file, sudo=False):
 
 	except Exception, e:
 		if not sudo:
-			return readConfigFile(config, file, True)
+			return readConfigFile(config, l_config, file, True)
 		else:
 			sys.stderr.write('zipSeries: cannot open \'' + color.BOLD + file + color.END + '\' for reading: No such file or directory\n')
 			sys.exit(0)
 
-	parseConfigFile(config, file, f_config)
+	parseConfigFile(config, l_config, file, f_config)
 
-def parseConfigFile(config, file, f_config):
+
+def parseConfigFile(config, l_config, file, f_config):
+
+	if config['verbose']:
+		print 'zipSeries: Parsing config file: ' + file
+
 	for i, line in enumerate(f_config):
 		line = line.strip()
-		# Allow empty lines
-		if line == '':
+		# Allow empty lines and allow comments (line starting with '#')
+		if line == '' or line[0] == '#':
 			continue
 
 		msg = line
 
+		# If the config line cannot be parsed an error should be written
 		if ' ' in line:
 			split_index = line.index(' ')
 			key = line[0:split_index]
 			value = line[split_index+1:]
 
 			if key in ['srv', 'usr', 'pwd', 'libl', 'obj']:
-				config[key] = value
+		
+				if config['verbose']:
+					print 'zipSeries: reading key: \'' + key + '\''
+
+				l_config[key] = value
+				# Continue the iteration to prevent the error fallthough
 				continue
 			else:
 				msg = 'Key not recornized: \'' + color.BOLD + key + color.END + '\''
@@ -114,19 +127,20 @@ def parseConfigFile(config, file, f_config):
 
 def processArgv(argv):
 	config = {
+		# when verbose is True zipSeries will print information about the programs workfow
 		'verbose': False,
 		'source': {
 			'srv': '',
 			'usr': '',
-			'pwd': '',
+			'pwd': '', # (optional - will prompt when needed)
 			'libl': '',
-			'obj': '',
+			'obj': '', # (optional)
 			'save-file': ''
 		},
 		'target': {
 			'srv': '',
 			'usr': '',
-			'pwd': '',
+			'pwd': '', # (optional - will prompt when needed)
 			'libl': '',
 			'save-file': ''
 		}
@@ -134,6 +148,24 @@ def processArgv(argv):
 
 	gate = None
 
+	# We need to iterate the argv's twice to support a more polomorphish interface
+	#   for instance if the --help option is set, we should only show help,
+	#   and not try to parse the other args, same goes for --version.
+	# It sould be posible to specify --verbose anywere:
+	for i, arg in enumerate(argv):
+		if arg == '--help':
+			writeHelp()
+			sys.exit(0)
+			argv.pop(i)
+		elif arg == '--version':
+			writeVersion()
+			sys.exit(0)
+			argv.pop(i)
+		elif arg == '--verbose' or gate == '-v':
+			config['verbose'] = True
+			argv.pop(i)
+
+	# In second iteration everything should now be in such a way that we dont care about the order of arguments
 	while len(argv):
 		arg = argv.pop(0)
 		if arg[0] == '-':
@@ -142,14 +174,6 @@ def processArgv(argv):
 		if gate == None:
 			sys.stderr.write('Try \'' + color.BOLD + 'zipSeries --help' + color.END + '\' for more information.\n')
 			sys.exit(1)
-		elif gate == '--help':
-			writeHelp()
-			sys.exit(0)
-		elif gate == '--version':
-			writeVersion()
-			sys.exit(0)
-		elif gate == '--verbose' or gate == '-v':
-			config['verbose'] = True
 		else:
 			no_gate = False
 			if gate[:2] == '--':
@@ -176,7 +200,7 @@ def processArgv(argv):
 				elif gate == '--source-obj' or gate == '-o':
 					config['source']['obj'] = arg
 				elif gate == '--source-config' or gate == '-c':
-					readConfigFile(config['source'], '/etc/zipSeries/' + arg + '.conf')
+					readConfigFile(config, config['source'], '/etc/zipSeries/' + arg + '.conf')
 				elif gate == '--source-save-file':
 					config['source']['save-file'] = arg
 				# Target Config
@@ -189,12 +213,12 @@ def processArgv(argv):
 				elif gate == '--target-libl' or gate == '-L':
 					config['target']['libl'] = arg
 				elif gate == '--target-config' or gate == '-C':
-					readConfigFile(config['target'], '/etc/zipSeries/' + arg + '.conf')
+					readConfigFile(config, config['target'], '/etc/zipSeries/' + arg + '.conf')
 				elif gate == '--target-save-file':
 					config['target']['save-file'] = arg
 				else:
 					no_gate = True
-
+			# if the option is not supported an error should be written
 			if no_gate:
 				sys.stderr.write('zipSeries: invalid option -- \'' + color.BOLD + (gate[2:] if gate[:2] == '--' else gate[1:]) + color.END + '\'\n')
 				sys.stderr.write('Try \'' + color.BOLD + 'zipSeries --help' + color.END + '\' for more information.\n')
@@ -202,11 +226,19 @@ def processArgv(argv):
 
 			gate = None
 
+	checkConfig(config)
+	
 	return config
 
+# checkConfig makes sure that all config options are specified.
+#  only the passwords can be left blank, they will be prompted later on
 def checkConfig(config):
 	# Source Config
-	if config['source']['save-file'] == '':
+	# Ignore all other --source-* options if --source-save-file is specified
+	if config['source']['save-file'] != '':
+		if config['verbose']:
+			print 'zipSeries: using --source-save-file, all other --source-* options are ignored'
+	else:
 		if config['source']['srv'] == '':
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-srv=server' + color.END + '\'\n')
 			sys.exit(1)
@@ -217,7 +249,11 @@ def checkConfig(config):
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr=user' + color.END + '\'\n')
 			sys.exit(1)
 
-	if config['target']['save-file'] == '':
+	# Ignore all other --source-* options if --source-save-file is specified
+	if config['target']['save-file'] != '':
+		if config['verbose']:
+			print 'zipSeries: using --target-save-file, all other --target-* options are ignored'
+	else:
 		if config['target']['srv'] == '':
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-srv=server' + color.END + '\'\n')
 			sys.exit(1)
@@ -234,19 +270,25 @@ class AS400:
 		self.target = config['target']
 
 	def save(self):
+		# save_file is the file which the AS/400 library / object should be saved to
 		save_file = ('/tmp/zipSeries-' + str(uuid.uuid1()) + '.zs4') if self.target['save-file'] == '' else self.target['save-file'];
 		self.source['save-file'] = save_file
-		
-		print self.target
+	
+		# TODO Write FTP script
+
+		print self.source
 
 	def restore(self, file):
+		# save_file is the saved file that should be restored on the AS/400
+		save_file = self.source['save-file']
+		
+		# TODO Write FTP script
+		
 		print self.target
 
 def main(argv):
 
 	config = processArgv(argv)
-
-	checkConfig(config)
 
 	as400 = AS400(config)
 	if config['source']['save-file'] == '':

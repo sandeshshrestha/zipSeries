@@ -40,7 +40,8 @@ Copy libraries / objects from one iSeries (AS/400) to another running the same (
 										if this option is set
 
 		  --help                      display this help and exit
-		  --version                   output version information and exit
+	  -v, --verbose                   be more verbose/talkative during the operation.
+	      --version                   output version information and exit
 
 ## Install:
 

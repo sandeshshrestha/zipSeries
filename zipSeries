@@ -66,6 +66,7 @@ def writeHelp():
 	print ''
 	# Othet Help
 	print '      --help                      display this help and exit'
+	print '  -v, --verbose                   be more verbose/talkative during the operation.'
 	print '      --version                   output version information and exit'
 
 def readConfigFile(config, file, sudo=False):
@@ -113,6 +114,7 @@ def parseConfigFile(config, file, f_config):
 
 def processArgv(argv):
 	config = {
+		'verbose': False,
 		'source': {
 			'srv': '',
 			'usr': '',
@@ -146,6 +148,8 @@ def processArgv(argv):
 		elif gate == '--version':
 			writeVersion()
 			sys.exit(0)
+		elif gate == '--verbose' or gate == '-v':
+			config['verbose'] = True
 		else:
 			no_gate = False
 			if gate[:2] == '--':

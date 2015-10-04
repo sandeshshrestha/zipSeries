@@ -161,7 +161,7 @@ def processArgv(argv):
 			writeVersion()
 			sys.exit(0)
 			argv.pop(i)
-		elif arg == '--verbose' or gate == '-v':
+		elif arg == '--verbose' or arg == '-v':
 			config['verbose'] = True
 			argv.pop(i)
 

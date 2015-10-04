@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 bash_dirname=$(cd "$(dirname ${BASH_SOURCE[0]})";pwd)
 
 echo Creating if not exists ~/bin

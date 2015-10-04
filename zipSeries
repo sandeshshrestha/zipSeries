@@ -256,6 +256,7 @@ def main(argv):
 			as400.save()
 		except Exception, e:
 			sys.stderr.write('zipSeries: Error happened while making savefile:\n');
+			sys.stderr.write(str(e) + '\n')
 			sys.exit(1)
 
 	if config['target']['save-file'] == '':
@@ -265,6 +266,7 @@ def main(argv):
 			as400.restore(config['source']['save-file'])
 		except Exception, e:
 			sys.stderr.write('zipSeries: Error happened while restoring savefile:\n');
+			sys.stderr.write(str(e) + '\n')
 			sys.exit(1)
 
 main(sys.argv[1:])

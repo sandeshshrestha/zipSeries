@@ -160,8 +160,8 @@ def processArgv(argv):
 					sys.stderr.write('zipSeries missing value for option -- \'' + color.BOLD + gate + color.END + '\'\n')
 					sys.exit(1)
 			else:
-				arg = argv.pop(0)
 				no_gate = (len(argv) == 0)
+				arg = argv.pop(0)
 
 			if not no_gate:
 				# Source Config

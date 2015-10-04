@@ -146,7 +146,7 @@ def processArgv(argv):
 		}
 	}
 
-	gate = None
+	option = None
 
 	# We need to iterate the argv's twice to support a more polomorphish interface
 	#   for instance if the --help option is set, we should only show help,
@@ -169,62 +169,62 @@ def processArgv(argv):
 	while len(argv):
 		arg = argv.pop(0)
 		if arg[0] == '-':
-			gate = arg
+			option = arg
 
-		if gate == None:
+		if option == None:
 			sys.stderr.write('Try \'' + color.BOLD + 'zipSeries --help' + color.END + '\' for more information.\n')
 			sys.exit(1)
 		else:
-			no_gate = False
-			if gate[:2] == '--':
-				if '=' in gate:
-					arg = gate[gate.index('=')+1:]
-					gate = gate[:gate.index('=')]
+			no_option = False
+			if option[:2] == '--':
+				if '=' in option:
+					arg = option[option.index('=')+1:]
+					option = option[:option.index('=')]
 				else:
-					sys.stderr.write('zipSeries missing value for option -- \'' + color.BOLD + gate + color.END + '\'\n')
+					sys.stderr.write('zipSeries missing value for option -- \'' + color.BOLD + option + color.END + '\'\n')
 					sys.exit(1)
 			else:
-				no_gate = (len(argv) == 0)
+				no_option = (len(argv) == 0)
 				arg = argv.pop(0)
 
-			if not no_gate:
+			if not no_option:
 				# Source Config
-				if gate == '--source-srv' or gate == '-s':
+				if option == '--source-srv' or option == '-s':
 					config['source']['srv'] = arg
-				elif gate == '--source-usr' or gate == '-u':
+				elif option == '--source-usr' or option == '-u':
 					config['source']['usr'] = arg
-				elif gate == '--source-pwd' or gate == '-p':
+				elif option == '--source-pwd' or option == '-p':
 					config['source']['pwd'] = arg
-				elif gate == '--source-libl' or gate == '-l':
+				elif option == '--source-libl' or option == '-l':
 					config['source']['libl'] = arg
-				elif gate == '--source-obj' or gate == '-o':
+				elif option == '--source-obj' or option == '-o':
 					config['source']['obj'] = arg
-				elif gate == '--source-config' or gate == '-c':
+				elif option == '--source-config' or option == '-c':
 					readConfigFile(config, config['source'], '/etc/zipSeries/' + arg + '.conf')
-				elif gate == '--source-save-file':
+				elif option == '--source-save-file':
 					config['source']['save-file'] = arg
 				# Target Config
-				elif gate == '--target-srv' or gate == '-S':
+				elif option == '--target-srv' or option == '-S':
 					config['target']['srv'] = arg
-				elif gate == '--target-usr' or gate == '-U':
+				elif option == '--target-usr' or option == '-U':
 					config['target']['usr'] = arg
-				elif gate == '--target-pwd' or gate == '-P':
+				elif option == '--target-pwd' or option == '-P':
 					config['target']['pwd'] = arg
-				elif gate == '--target-libl' or gate == '-L':
+				elif option == '--target-libl' or option == '-L':
 					config['target']['libl'] = arg
-				elif gate == '--target-config' or gate == '-C':
+				elif option == '--target-config' or option == '-C':
 					readConfigFile(config, config['target'], '/etc/zipSeries/' + arg + '.conf')
-				elif gate == '--target-save-file':
+				elif option == '--target-save-file':
 					config['target']['save-file'] = arg
 				else:
-					no_gate = True
+					no_option = True
 			# if the option is not supported an error should be written
-			if no_gate:
-				sys.stderr.write('zipSeries: invalid option -- \'' + color.BOLD + (gate[2:] if gate[:2] == '--' else gate[1:]) + color.END + '\'\n')
+			if no_option:
+				sys.stderr.write('zipSeries: invalid option -- \'' + color.BOLD + (option[2:] if option[:2] == '--' else option[1:]) + color.END + '\'\n')
 				sys.stderr.write('Try \'' + color.BOLD + 'zipSeries --help' + color.END + '\' for more information.\n')
 				sys.exit(1)
 
-			gate = None
+			option = None
 
 	checkConfig(config)
 	

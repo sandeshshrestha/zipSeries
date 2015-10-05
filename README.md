@@ -74,20 +74,20 @@ Make sure that ~/bin is in your `$PATH` variable:
 
 ###Making backup:
 
-By specifying `--target-save-file file.zs4` you can take local backups
+By specifying `--source-save-file file.zs4` you can take local backups
 
 	# You will be prompted with password
 	zipSeries \
 		--source-srv server1 --source-usr QSECOFR --source-libl MYLIB --source-obj MYOBJ \
-		--target-save-file ~/my_save_file.zs4
+		--source-save-file ~/my_save_file.zs4
 
 ###Restoring from backup:
 
-By specifying `--source-save-file file.zs4` you can restore from a local backup
+By specifying `--target-save-file file.zs4` you can restore from a local backup
 
 	# You will be prompted with password
 	zipSeries \
-		--source-save-file ~/my_save_file.zs4 \
+		--target-save-file ~/my_save_file.zs4 \
 		--target-srv server --target-usr QSECOFR --target-libl MYLIB
 
 
@@ -105,5 +105,5 @@ You can create config files to ease tedious backup processes etc, all config fil
 
 	$ zipSeries \
 		--source-config server1 \
-		--target-save-file ~/my_save_file.zs4
+		--source-save-file ~/my_save_file.zs4
 

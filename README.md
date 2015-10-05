@@ -13,36 +13,38 @@
 Copy libraries / objects from one iSeries (AS/400) to another running the same (or lower) release of OS/400 as the source machine
 
 	$ zipSeries --help
-	usage: usage: zipSeries [--version] [--help] [OPTION]...
+	usage: usage: zipSeries [--version] | [--help] | [OPTION]...
 
 	Copy libraries / objects from one iSeries (AS/400) to another running the same
 	(or lower) release of OS/400 as source.
 
 	source options:
-	  -s, --source-srv S_SRV          set server for the source
-	  -u, --source-usr S_USR          set user profile for the source
-	  -p, --source-pwd S_PWD          set user password for the source
-	  -l, --source-libl S_LIBL        set library for the source
-	  -o, --source-obj S_OBJ          set object for the source - leave blank if
-	                                  whole library is saved
-	  -c, --source-config S_CONFIG    read source config from file
-	  --source-save-file S_SAVE_FILE  save OS/400 savfile locally all --target-*
-	                                  options will ignored
+	  -s , --source-srv      set server for the source
+	  -u , --source-usr      set user profile for the source
+	  -p , --source-pwd      set user password for the source
+	  -l , --source-libl     set library for the source
+	  -o , --source-obj      set object for the source - leave blank if whole
+	                         library is saved
+	  --source-obj-type      set object type for the source
+	  -c , --source-config   read source config from file
+	  --source-save-file     save OS/400 savfile locally all --target-* options
+	                         will ignored
 
 	target options:
-	  -S, --target-srv T_SRV          set server for the target
-	  -U, --target-usr T_USR          set user profile for the target
-	  -P, --target-pwd T_PWD          set user password for the target
-	  -L, --target-libl T_LIBL        set library for the target
-	  -C, --target-config T_CONFIG    read target config from file
-	  --target-save-file T_SAVE_FILE  restore from OS/400 savfile stored locally
-	                                  all --source-* options will ignored
+	  --target-release       set OS/400 release for the target
+	  -S , --target-srv      set server for the target
+	  -U , --target-usr      set user profile for the target
+	  -P , --target-pwd      set user password for the target
+	  -L , --target-libl     set library for the target
+	  -C , --target-config   read target config from file
+	  --target-save-file     restore from OS/400 savfile stored locally all
+	                         --source-* options will ignored
 
 	options:
-	  -v, --verbose                   be more verbose/talkative during the
-	                                  operation
-	  --version                       output version information and exit
-	  --help                          show this help message and exit
+	  -v, --verbose          be more verbose/talkative during the operation
+	  --version              output version information and exit
+	  --help                 show this help message and exit
+
 
 ## Install:
 

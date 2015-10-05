@@ -72,7 +72,7 @@ def parse_config_file(config, l_config, file, f_config):
 				# Continue the iteration to prevent the error fallthough
 				continue
 			else:
-				msg = 'Key not recornized: \'' + color.BOLD + key + color.END + '\''
+				msg = 'Key not recornized: \'' + color.BOLD + key + color.END + '\' in line \'' + line + '\''
 
 		# Fallthough to error print
 		sys.stderr.write('zipSeries: Cannot parse \'' + color.BOLD + file + color.END + '\':\n')
@@ -92,27 +92,27 @@ def main():
 	target_group = parser.add_argument_group('target options')
 	general_group = parser.add_argument_group('options')
 	
-	# General
-	general_group.add_argument('-v, --verbose', dest='verbose', action='store_true', default=False, help='be more verbose/talkative during the operation')
-	general_group.add_argument('--version', dest='version', action='store_true', default=False, help='output version information and exit')
-	general_group.add_argument('--help', dest='help', action='store_true', default=False, help='show this help message and exit')
-
 	# Source
-	source_group.add_argument('-s, --source-srv', dest='s_srv', help='set server for the source')
-	source_group.add_argument('-u, --source-usr', dest='s_usr', help='set user profile for the source')
-	source_group.add_argument('-p, --source-pwd', dest='s_pwd', help='set user password for the source')
-	source_group.add_argument('-l, --source-libl', dest='s_libl', help='set library for the source')
-	source_group.add_argument('-o, --source-obj', dest='s_obj', help='set object for the source - leave blank if whole library is saved')
-	source_group.add_argument('-c, --source-config', dest='s_config', help='read source config from file')
+	source_group.add_argument('-s', '--source-srv', dest='s_srv', help='set server for the source')
+	source_group.add_argument('-u', '--source-usr', dest='s_usr', help='set user profile for the source')
+	source_group.add_argument('-p', '--source-pwd', dest='s_pwd', help='set user password for the source')
+	source_group.add_argument('-l', '--source-libl', dest='s_libl', help='set library for the source')
+	source_group.add_argument('-o', '--source-obj', dest='s_obj', help='set object for the source - leave blank if whole library is saved')
+	source_group.add_argument('-c', '--source-config', dest='s_config', help='read source config from file')
 	source_group.add_argument('--source-save-file', dest='s_save_file', type=argparse.FileType('w'), help='save OS/400 savfile locally all --target-* options will ignored')
 
 	# Target
-	target_group.add_argument('-S, --target-srv', dest='t_srv', help='set server for the target')
-	target_group.add_argument('-U, --target-usr', dest='t_usr', help='set user profile for the target')
-	target_group.add_argument('-P, --target-pwd', dest='t_pwd', help='set user password for the target')
-	target_group.add_argument('-L, --target-libl', dest='t_libl', help='set library for the target')
-	target_group.add_argument('-C, --target-config', dest='t_config', help='read target config from file')
+	target_group.add_argument('-S', '--target-srv', dest='t_srv', help='set server for the target')
+	target_group.add_argument('-U', '--target-usr', dest='t_usr', help='set user profile for the target')
+	target_group.add_argument('-P', '--target-pwd', dest='t_pwd', help='set user password for the target')
+	target_group.add_argument('-L', '--target-libl', dest='t_libl', help='set library for the target')
+	target_group.add_argument('-C', '--target-config', dest='t_config', help='read target config from file')
 	target_group.add_argument('--target-save-file', dest='t_save_file', type=argparse.FileType('w'), help='restore from OS/400 savfile stored locally all --source-* options will ignored')
+
+	# General
+	general_group.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False, help='be more verbose/talkative during the operation')
+	general_group.add_argument('--version', dest='version', action='store_true', default=False, help='output version information and exit')
+	general_group.add_argument('--help', dest='help', action='store_true', default=False, help='show this help message and exit')
 
 	args = parser.parse_args()
 

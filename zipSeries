@@ -15,7 +15,7 @@ import uuid
 from src.color import color
 from src.AS400 import AS400
 
-def writeVersion():
+def print_version():
 	print 'zipSeries ' + VERSION
 	print ''
 	print 'Copyright (C) 2015 System & Method A/S Denmark'
@@ -23,45 +23,9 @@ def writeVersion():
 	print ''
 	print 'Written by Andreas Louv <and@sitemule.com>'
 
-def writeHelp():
-
-	print 'usage: zipSeries [--version] [--help] [OPTION]...'
-	print ''
-	print 'Copy libraries / objects from one iSeries (AS/400) to another running'
-	print '  the same (or lower) release of OS/400 as source.'
-	print ''
-	print 'Mandatory arguments to long options are mandatory for short options too.'
-
-	# Source Help
-	print '  -s, --source-srv=[server]       set server for the source'
-	print '  -u, --source-usr=[user]         set user profile for the source'
-	print '  -p, --source-pwd=[password]     set user password for the source'
-	print '  -l, --source-libl=[library]     set library for the source'
-	print '  -o, --source-obj=[object]       set oject for the source'
-	print '                                  leave blank if whole library is saved'
-	print '  -c, --source-config=[config]    use file to set source config'
-	print '      --source-save-file=[file]   save OS/400 savfile locally'
-	print '                                    all other --source-* options will ignored '
-	print '                                    if this option is set'
-	print ''
-	# Target Help
-	print '  -S, --target-srv=[server]       set server for the target'
-	print '  -U, --target-usr=[user]         set user profile for the target'
-	print '  -P, --target-pwd=[password]     set user password for the target'
-	print '  -L, --target-libl=[library]     set library for the target'
-	print '  -C, --target-config=[config]    use file to set target config'
-	print '      --target-save-file=[file]   restore from OS/400 savfile stored locally'
-	print '                                    all other --target-* options will ignored '
-	print '                                    if this option is set'
-	print ''
-	# Othet Help
-	print '      --help                      display this help and exit'
-	print '  -v, --verbose                   be more verbose/talkative during the operation.'
-	print '      --version                   output version information and exit'
-
-# readConfigFile will call itself again with the sudo=True argument,
+# read_config_file will call itself again with the sudo=True argument,
 #   this is so we will only run as sudo if necessary.
-def readConfigFile(config, l_config, file, sudo=False):
+def read_config_file(config, l_config, file, sudo=False):
 	cmd = ['cat', file]
 
 	if sudo:
@@ -72,15 +36,15 @@ def readConfigFile(config, l_config, file, sudo=False):
 
 	except Exception, e:
 		if not sudo:
-			return readConfigFile(config, l_config, file, True)
+			return read_config_file(config, l_config, file, True)
 		else:
 			sys.stderr.write('zipSeries: cannot open \'' + color.BOLD + file + color.END + '\' for reading: No such file or directory\n')
 			sys.exit(0)
 
-	parseConfigFile(config, l_config, file, f_config)
+	parse_config_file(config, l_config, file, f_config)
 
 
-def parseConfigFile(config, l_config, file, f_config):
+def parse_config_file(config, l_config, file, f_config):
 
 	if config['verbose']:
 		print 'zipSeries: Parsing config file: ' + file
@@ -100,7 +64,7 @@ def parseConfigFile(config, l_config, file, f_config):
 			value = line[split_index+1:]
 
 			if key in ['srv', 'usr', 'pwd', 'libl', 'obj']:
-		
+
 				if config['verbose']:
 					print 'zipSeries: reading key: \'' + key + '\''
 
@@ -115,152 +79,77 @@ def parseConfigFile(config, l_config, file, f_config):
 		sys.stderr.write('Line (' + str(i+1) + '): ' + msg + '\n')
 		sys.exit(1)
 
-def processArgv(argv):
+def main():
+	import argparse
+	parser = argparse.ArgumentParser(
+		description='Copy libraries / objects from one iSeries (AS/400) to another running the same (or lower) release of OS/400 as source.', 
+		usage='usage: zipSeries [--version] [--help] [OPTION]...',
+		formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=50)
+	)
+
+	# General
+	parser.add_argument('-v, --verbose', dest='verbose', action='store_true', default=False, help='be more verbose/talkative during the operation.')
+	parser.add_argument('--version', dest='version', action='store_true', default=False, help='output version information and exit')
+
+	source_group = parser.add_argument_group('Source Options')
+	target_group = parser.add_argument_group('Source Options')
+	
+	# Source
+	source_group.add_argument('-s, --source-srv', dest='s_srv', help='set server for the source')
+	source_group.add_argument('-u, --source-usr', dest='s_usr', help='set user profile for the source')
+	source_group.add_argument('-p, --source-pwd', dest='s_pwd', help='set user password for the source')
+	source_group.add_argument('-l, --source-libl', dest='s_libl', help='set library for the source')
+	source_group.add_argument('-o, --source-obj', dest='s_obj', help='set object for the source - leave blank if whole library is saved')
+	source_group.add_argument('-c, --source-config', dest='s_config', help='read source config from file')
+	source_group.add_argument('--source-save-file', dest='s_save_file', type=argparse.FileType('w'), help='save OS/400 savfile locally all --target-* options will ignored')
+
+	# Target
+	target_group.add_argument('-S, --target-srv', dest='t_srv', help='set server for the target')
+	target_group.add_argument('-U, --target-usr', dest='t_usr', help='set user profile for the target')
+	target_group.add_argument('-P, --target-pwd', dest='t_pwd', help='set user password for the target')
+	target_group.add_argument('-L, --target-libl', dest='t_libl', help='set library for the target')
+	target_group.add_argument('-C, --target-config', dest='t_config', help='read target config from file')
+	target_group.add_argument('--target-save-file', dest='t_save_file', type=argparse.FileType('w'), help='restore from OS/400 savfile stored locally all --source-* options will ignored')
+
+	args = parser.parse_args()
+
+	if args.version:
+		print_version()
+		sys.exit(0)
+
 	config = {
 		# when verbose is True zipSeries will print information about the programs workfow
-		'verbose': False,
+		'verbose': args.verbose,
 		'source': {
-			'srv': '',
-			'usr': '',
-			'pwd': '', # (optional - will prompt when needed)
-			'libl': '',
-			'obj': '', # (optional)
-			'save-file': ''
+			'srv': args.s_srv,
+			'usr': args.s_usr,
+			'pwd': args.s_pwd, # (optional - will prompt when needed)
+			'libl': args.s_libl,
+			'obj': args.s_obj, # (optional)
+			'save-file': args.s_save_file
 		},
 		'target': {
-			'srv': '',
-			'usr': '',
-			'pwd': '', # (optional - will prompt when needed)
-			'libl': '',
-			'save-file': ''
+			'srv': args.t_srv,
+			'usr': args.t_usr,
+			'pwd': args.t_pwd, # (optional - will prompt when needed)
+			'libl': args.t_libl,
+			'save-file': args.t_save_file
 		}
 	}
 
-	option = None
 
-	# We need to iterate the argv's twice to support a more polomorphish interface
-	#   for instance if the --help option is set, we should only show help,
-	#   and not try to parse the other args, same goes for --version.
-	# It sould be posible to specify --verbose anywere:
-	for i, arg in enumerate(argv):
-		if arg == '--help':
-			writeHelp()
-			sys.exit(0)
-			argv.pop(i)
-		elif arg == '--version':
-			writeVersion()
-			sys.exit(0)
-			argv.pop(i)
-		elif arg == '--verbose' or arg == '-v':
-			config['verbose'] = True
-			argv.pop(i)
+	if args.s_config:
+		read_config_file(config, config['source'], '/etc/zipSeries/' + args.s_config + '.conf')
 
-	# In second iteration everything should now be in such a way that we dont care about the order of arguments
-	while len(argv):
-		arg = argv.pop(0)
-		if arg[0] == '-':
-			option = arg
-
-		if option == None:
-			sys.stderr.write('Try \'' + color.BOLD + 'zipSeries --help' + color.END + '\' for more information.\n')
-			sys.exit(1)
-		else:
-			no_option = False
-			if option[:2] == '--':
-				if '=' in option:
-					arg = option[option.index('=')+1:]
-					option = option[:option.index('=')]
-				else:
-					sys.stderr.write('zipSeries missing value for option -- \'' + color.BOLD + option + color.END + '\'\n')
-					sys.exit(1)
-			else:
-				no_option = (len(argv) == 0)
-				arg = argv.pop(0)
-
-			if not no_option:
-				# Source Config
-				if option == '--source-srv' or option == '-s':
-					config['source']['srv'] = arg
-				elif option == '--source-usr' or option == '-u':
-					config['source']['usr'] = arg
-				elif option == '--source-pwd' or option == '-p':
-					config['source']['pwd'] = arg
-				elif option == '--source-libl' or option == '-l':
-					config['source']['libl'] = arg
-				elif option == '--source-obj' or option == '-o':
-					config['source']['obj'] = arg
-				elif option == '--source-config' or option == '-c':
-					readConfigFile(config, config['source'], '/etc/zipSeries/' + arg + '.conf')
-				elif option == '--source-save-file':
-					config['source']['save-file'] = arg
-				# Target Config
-				elif option == '--target-srv' or option == '-S':
-					config['target']['srv'] = arg
-				elif option == '--target-usr' or option == '-U':
-					config['target']['usr'] = arg
-				elif option == '--target-pwd' or option == '-P':
-					config['target']['pwd'] = arg
-				elif option == '--target-libl' or option == '-L':
-					config['target']['libl'] = arg
-				elif option == '--target-config' or option == '-C':
-					readConfigFile(config, config['target'], '/etc/zipSeries/' + arg + '.conf')
-				elif option == '--target-save-file':
-					config['target']['save-file'] = arg
-				else:
-					no_option = True
-			# if the option is not supported an error should be written
-			if no_option:
-				sys.stderr.write('zipSeries: invalid option -- \'' + color.BOLD + (option[2:] if option[:2] == '--' else option[1:]) + color.END + '\'\n')
-				sys.stderr.write('Try \'' + color.BOLD + 'zipSeries --help' + color.END + '\' for more information.\n')
-				sys.exit(1)
-
-			option = None
+	if args.t_config:
+		read_config_file(config, config['target'], '/etc/zipSeries/' + args.t_config + '.conf')
 
 	checkConfig(config)
-	
-	return config
-
-# checkConfig makes sure that all config options are specified.
-#  only the passwords can be left blank, they will be prompted later on
-def checkConfig(config):
-	# Source Config
-	# Ignore all other --source-* options if --source-save-file is specified
-	if config['source']['save-file'] != '':
-		if config['verbose']:
-			print 'zipSeries: using --source-save-file, all other --source-* options are ignored'
-	else:
-		if config['source']['srv'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-srv=server' + color.END + '\'\n')
-			sys.exit(1)
-		if config['source']['libl'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-l, --source-libl=library' + color.END + '\'\n')
-			sys.exit(1)
-		if config['source']['usr'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr=user' + color.END + '\'\n')
-			sys.exit(1)
-
-	# Ignore all other --source-* options if --source-save-file is specified
-	if config['target']['save-file'] != '':
-		if config['verbose']:
-			print 'zipSeries: using --target-save-file, all other --target-* options are ignored'
-	else:
-		if config['target']['srv'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-srv=server' + color.END + '\'\n')
-			sys.exit(1)
-		if config['target']['libl'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-L, --target-libl=library' + color.END + '\'\n')
-			sys.exit(1)
-		if config['target']['usr'] == '':
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-U, --target-usr=user' + color.END + '\'\n')
-			sys.exit(1)
-
-def main(argv):
-
-	config = processArgv(argv)
 
 	as400 = AS400(config)
-	if config['source']['save-file'] == '':
-		if config['source']['pwd'] == '':
+	
+	if config['source']['save-file'] == None:
+		if config['source']['pwd'] == None:
 			config['source']['pwd'] = getpass.getpass('Enter source user password: ')
 		try:
 			as400.save()
@@ -269,8 +158,8 @@ def main(argv):
 			sys.stderr.write(str(e) + '\n')
 			sys.exit(1)
 
-	if config['target']['save-file'] == '':
-		if config['target']['pwd'] == '':
+	if config['target']['save-file'] == None:
+		if config['target']['pwd'] == None:
 			config['target']['pwd'] = getpass.getpass('Enter target user password: ')
 		try:
 			as400.restore(config['source']['save-file'])
@@ -279,6 +168,39 @@ def main(argv):
 			sys.stderr.write(str(e) + '\n')
 			sys.exit(1)
 
+# checkConfig makes sure that all config options are specified.
+#  only the passwords can be left blank, they will be prompted later on
+def checkConfig(config):
+	# Source Config
+	# Ignore all other --source-* options if --source-save-file is specified
+	if config['source']['save-file'] != None:
+		if config['verbose']:
+			print 'zipSeries: using --source-save-file, all other --source-* options are ignored'
+	else:
+		if config['source']['srv'] == None:
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-srv=server' + color.END + '\'\n')
+			sys.exit(1)
+		if config['source']['libl'] == None:
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-l, --source-libl=library' + color.END + '\'\n')
+			sys.exit(1)
+		if config['source']['usr'] == None:
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr=user' + color.END + '\'\n')
+			sys.exit(1)
+
+	# Ignore all other --source-* options if --source-save-file is specified
+	if config['target']['save-file'] != None:
+		if config['verbose']:
+			print 'zipSeries: using --target-save-file, all other --target-* options are ignored'
+	else:
+		if config['target']['srv'] == None:
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-srv=server' + color.END + '\'\n')
+			sys.exit(1)
+		if config['target']['libl'] == None:
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-L, --target-libl=library' + color.END + '\'\n')
+			sys.exit(1)
+		if config['target']['usr'] == None:
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-U, --target-usr=user' + color.END + '\'\n')
+			sys.exit(1)
 # only run if called from command line
-if __name__ == "__main__":
-	main(sys.argv[1:])
+if __name__ == '__main__':
+	main()

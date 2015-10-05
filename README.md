@@ -13,35 +13,36 @@
 Copy libraries / objects from one iSeries (AS/400) to another running the same (or lower) release of OS/400 as the source machine
 
 	$ zipSeries --help
-	usage: zipSeries [--version] [--help] [OPTION]...
+	usage: usage: zipSeries [--version] [--help] [OPTION]...
 
-	Copy libraries / objects from one iSeries (AS/400) to another running
-	  the same (or lower) release of OS/400 as source.
+	Copy libraries / objects from one iSeries (AS/400) to another running the same
+	(or lower) release of OS/400 as source.
 
-	Mandatory arguments to long options are mandatory for short options too.
-	  -s, --source-srv=[server]       set server for the source
-	  -u, --source-usr=[user]         set user profile for the source
-	  -p, --source-pwd=[password]     set user password for the source
-	  -l, --source-libl=[library]     set library for the source
-	  -o, --source-obj=[object]       set oject for the source
-									  leave blank if whole library is saved
-	  -c, --source-config=[config]    use file to set source config
-		  --source-save-file=[file]   save OS/400 savfile locally
-										all other --source-* options will ignored 
-										if this option is set
+	optional arguments:
+	  -h, --help                      show this help message and exit
+	  -v, --verbose                   be more verbose/talkative during the
+	                                  operation.
+	  --version                       output version information and exit
 
-	  -S, --target-srv=[server]       set server for the target
-	  -U, --target-usr=[user]         set user profile for the target
-	  -P, --target-pwd=[password]     set user password for the target
-	  -L, --target-libl=[library]     set library for the target
-	  -C, --target-config=[config]    use file to set target config
-		  --target-save-file=[file]   restore from OS/400 savfile stored locally
-										all other --target-* options will ignored 
-										if this option is set
+	Source Options:
+	  -s, --source-srv S_SRV          set server for the source
+	  -u, --source-usr S_USR          set user profile for the source
+	  -p, --source-pwd S_PWD          set user password for the source
+	  -l, --source-libl S_LIBL        set library for the source
+	  -o, --source-obj S_OBJ          set object for the source - leave blank if
+	                                  whole library is saved
+	  -c, --source-config S_CONFIG    read source config from file
+	  --source-save-file S_SAVE_FILE  save OS/400 savfile locally all --target-*
+	                                  options will ignored
 
-		  --help                      display this help and exit
-	  -v, --verbose                   be more verbose/talkative during the operation.
-	      --version                   output version information and exit
+	Source Options:
+	  -S, --target-srv T_SRV          set server for the target
+	  -U, --target-usr T_USR          set user profile for the target
+	  -P, --target-pwd T_PWD          set user password for the target
+	  -L, --target-libl T_LIBL        set library for the target
+	  -C, --target-config T_CONFIG    read target config from file
+	  --target-save-file T_SAVE_FILE  restore from OS/400 savfile stored locally
+	                                  all --source-* options will ignored
 
 ## Install:
 

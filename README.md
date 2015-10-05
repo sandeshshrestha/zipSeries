@@ -18,13 +18,7 @@ Copy libraries / objects from one iSeries (AS/400) to another running the same (
 	Copy libraries / objects from one iSeries (AS/400) to another running the same
 	(or lower) release of OS/400 as source.
 
-	optional arguments:
-	  -h, --help                      show this help message and exit
-	  -v, --verbose                   be more verbose/talkative during the
-	                                  operation.
-	  --version                       output version information and exit
-
-	Source Options:
+	source options:
 	  -s, --source-srv S_SRV          set server for the source
 	  -u, --source-usr S_USR          set user profile for the source
 	  -p, --source-pwd S_PWD          set user password for the source
@@ -35,7 +29,7 @@ Copy libraries / objects from one iSeries (AS/400) to another running the same (
 	  --source-save-file S_SAVE_FILE  save OS/400 savfile locally all --target-*
 	                                  options will ignored
 
-	Source Options:
+	target options:
 	  -S, --target-srv T_SRV          set server for the target
 	  -U, --target-usr T_USR          set user profile for the target
 	  -P, --target-pwd T_PWD          set user password for the target
@@ -43,6 +37,12 @@ Copy libraries / objects from one iSeries (AS/400) to another running the same (
 	  -C, --target-config T_CONFIG    read target config from file
 	  --target-save-file T_SAVE_FILE  restore from OS/400 savfile stored locally
 	                                  all --source-* options will ignored
+
+	options:
+	  -v, --verbose                   be more verbose/talkative during the
+	                                  operation
+	  --version                       output version information and exit
+	  --help                          show this help message and exit
 
 ## Install:
 

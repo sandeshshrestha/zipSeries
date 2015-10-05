@@ -84,16 +84,19 @@ def main():
 	parser = argparse.ArgumentParser(
 		description='Copy libraries / objects from one iSeries (AS/400) to another running the same (or lower) release of OS/400 as source.', 
 		usage='usage: zipSeries [--version] [--help] [OPTION]...',
-		formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=50)
+		formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=50),
+		add_help=False
 	)
 
-	# General
-	parser.add_argument('-v, --verbose', dest='verbose', action='store_true', default=False, help='be more verbose/talkative during the operation.')
-	parser.add_argument('--version', dest='version', action='store_true', default=False, help='output version information and exit')
-
-	source_group = parser.add_argument_group('Source Options')
-	target_group = parser.add_argument_group('Source Options')
+	source_group = parser.add_argument_group('source options')
+	target_group = parser.add_argument_group('target options')
+	general_group = parser.add_argument_group('options')
 	
+	# General
+	general_group.add_argument('-v, --verbose', dest='verbose', action='store_true', default=False, help='be more verbose/talkative during the operation')
+	general_group.add_argument('--version', dest='version', action='store_true', default=False, help='output version information and exit')
+	general_group.add_argument('--help', dest='help', action='store_true', default=False, help='show this help message and exit')
+
 	# Source
 	source_group.add_argument('-s, --source-srv', dest='s_srv', help='set server for the source')
 	source_group.add_argument('-u, --source-usr', dest='s_usr', help='set user profile for the source')
@@ -113,6 +116,9 @@ def main():
 
 	args = parser.parse_args()
 
+	if args.help:
+		parser.print_help()
+		sys.exit(0)
 	if args.version:
 		print_version()
 		sys.exit(0)

@@ -46,7 +46,7 @@ fi
 
 if [ "$norc" = false ]; then
 	if [[ -f ~/.bashrc ]]; then
-		echo "$pgm adding \"source $bash_dirname/.bashrc\" to ~/.bashrc"
+		echo "$pgm: adding \"source $bash_dirname/.bashrc\" to ~/.bashrc"
 		echo '#Added by ZipSeries:' >> ~/.bashrc
 		echo "[[ -f \"$bash_dirname/.bashrc\" ]] && source \"$bash_dirname/.bashrc\"" >> ~/.bashrc
 	fi

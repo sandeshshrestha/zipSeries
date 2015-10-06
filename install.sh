@@ -41,20 +41,20 @@ if [ "$nosymlink" = false ]; then
 	mkdir -p ~/bin
 
 	echo Making symlink to ~/bin/zipSeries for $bash_dirname/zipSeries
-#	ln -s "$bash_dirname/zipSeries" ~/bin/zipSeries
+	ln -s "$bash_dirname/zipSeries" ~/bin/zipSeries
 fi
 
 if [ "$norc" = false ]; then
 	if [[ -f ~/.bashrc ]]; then
 		echo "Adding \"source $bash_dirname/.bashrc\" to ~/.bashrc"
 		echo '#Added by ZipSeries:' >> ~/.bashrc
-#		echo "[[ -f \"$bash_dirname/.bashrc\" ]] && source \"$bash_dirname/.bashrc\"" >> ~/.bashrc
+		echo "[[ -f \"$bash_dirname/.bashrc\" ]] && source \"$bash_dirname/.bashrc\"" >> ~/.bashrc
 	fi
 
 	if [[ -f ~/.zshrc ]]; then
 		echo "Adding \"source $bash_dirname/.zshrc\" to ~/.zshrc"
 		echo '#Added by ZipSeries:' >> ~/.zshrc
-#		echo "[[ -f \"$bash_dirname/.zshrc\" ]] && source \"$bash_dirname/.zshrc\"" >> ~/.zshrc
+		echo "[[ -f \"$bash_dirname/.zshrc\" ]] && source \"$bash_dirname/.zshrc\"" >> ~/.zshrc
 	fi
 fi
 

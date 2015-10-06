@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 bash_dirname=$(cd "$(dirname ${BASH_SOURCE[0]})";pwd)
 
+echo Compiling zipSeries.py to zipSeries
+python -m py_compile zipSeries.py
+mv zipSeries.pyc zipSeries
+chmod +x zipSeries
+
+exit
+
 echo Creating if not exists ~/bin
 mkdir -p ~/bin
 

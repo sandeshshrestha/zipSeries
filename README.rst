@@ -83,7 +83,7 @@ Copy single object
 
 .. code-block:: bash
 
-# You will be prompted with password
+	# You will be prompted with password
 	zipSeries \
 		--source-srv server1 --source-usr QSECOFR --source-libl MYLIB --source-obj MYOBJ \
 		--target-srv server2 --target-usr QSECOFR --target-libl MYLIB

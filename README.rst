@@ -1,18 +1,31 @@
-# WIP - Not working (ETA medio October)
+=============
+zipSeries CLI
+=============
 
-* [Install](#install)
-* [Usage](#usage)
-  * [Copy single object](#copy-single-object)
-  * [Copy whole library](#copy-whole-library)
-  * [Restoring from backup](#restoring-from-backup)
-* [Config Files](#config-files)
+:Author: `Andreas Louv <and@sitemule.com>`_
 
+.. contents::
+	:backlinks: none
 
-# zipSeries CLI
+.. sectnum::
 
-This is a command line interface of the [software ZipSeries](http://www.system-method.com/ZipSeries)
+Introduction
+============
+
+What is zipSeries CLI?
+----------------------
+
+zipSeries CLI is a command line interface for the software `zipSeries <http://www.system-method.com/ZipSeries>`_.
 
 Copy libraries / objects from one iSeries (AS/400) to another running the same (or lower) release of OS/400 as the source machine
+
+How is zipSeries CLI licensed?
+------------------------------
+
+MIT license. See the `LICENSE` fil in the distribution.
+
+zipSeries --help
+----------------
 
 	$ zipSeries --help
 	usage: usage: zipSeries [--version] | [--help] | [OPTION]...
@@ -47,8 +60,8 @@ Copy libraries / objects from one iSeries (AS/400) to another running the same (
 	  --version              output version information and exit
 	  --help                 show this help message and exit
 
-
-## Install:
+Install
+=======
 
 	git clone ssh://github.com/ginkoms/zipSeries
 	cd zipSeries
@@ -58,45 +71,50 @@ Make sure that ~/bin is in your `$PATH` variable:
 
 	export PATH="~/bin:$PATH"
 
-## Usage:
 
-###Copy single object:
+Usage
+=====
+
+Copy single object
+------------------
 
 	# You will be prompted with password
 	zipSeries \
 		--source-srv server1 --source-usr QSECOFR --source-libl MYLIB --source-obj MYOBJ \
 		--target-srv server2 --target-usr QSECOFR --target-libl MYLIB
 
-###Copy whole library:
+Copy whole library
+------------------
 
 	# You will be prompted with password
 	zipSeries \
 		--source-srv server1 --source-usr QSECOFR --source-libl MYLIB \
 		--target-srv server2 --target-usr QSECOFR --target-libl MYLIB
 
-###Making backup:
+Making backup
+-------------
 
-By specifying `--source-save-file file.zs4` you can take local backups
+By specifying `--source-save-file file.4zs` you can take local backups
 
 	# You will be prompted with password
 	zipSeries \
 		--source-srv server1 --source-usr QSECOFR --source-libl MYLIB --source-obj MYOBJ \
 		--source-save-file ~/my_save_file.zs4
 
-###Restoring from backup:
+Restoring from backup
+---------------------
 
-By specifying `--target-save-file file.zs4` you can restore from a local backup
+By specifying `--target-save-file file.4zs` you can restore from a local backup
 
 	# You will be prompted with password
 	zipSeries \
 		--target-save-file ~/my_save_file.zs4 \
 		--target-srv server --target-usr QSECOFR --target-libl MYLIB
 
-
-## Config Files
+Config Files
+------------
 
 You can create config files to ease tedious backup processes etc, all config files should be stored in /etc/zipSeries and should have the extension .conf:
-
 
 	$ cat /etc/zipSeries/server1.conf
 	srv server1

@@ -10,6 +10,8 @@
 
 # zipSeries CLI
 
+This is a command line interface of the [software ZipSeries](http://www.system-method.com/ZipSeries)
+
 Copy libraries / objects from one iSeries (AS/400) to another running the same (or lower) release of OS/400 as the source machine
 
 	$ zipSeries --help

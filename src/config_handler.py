@@ -79,7 +79,7 @@ def parse_config_file(config, l_config, file, f_config):
 			if key in ['release', 'srv', 'usr', 'pwd', 'libl', 'obj', 'obj-type']:
 
 				if config['verbose']:
-					print 'zipSeries: reading key: \'' + key + '\''
+					print '    setting key \'' + key + '\': \'' + value + '\''
 
 				if key == 'release' and value not in RELEASE_LIST:
 					msg = 'release not supported: \'' + value + '\', supported releases: \'' + (', '.join(RELEASE_LIST)) + '\''

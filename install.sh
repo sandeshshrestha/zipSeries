@@ -37,29 +37,29 @@ mv zipSeries.pyc zipSeries
 chmod +x zipSeries
 
 if [ "$nosymlink" = false ]; then
-	echo Creating if not exists ~/bin
+	echo $pgm: creating if not exists ~/bin
 	mkdir -p ~/bin
 
-	echo Making symlink to ~/bin/zipSeries for $bash_dirname/zipSeries
+	echo $pgm: making symlink to ~/bin/zipSeries for $bash_dirname/zipSeries
 	ln -s "$bash_dirname/zipSeries" ~/bin/zipSeries
 fi
 
 if [ "$norc" = false ]; then
 	if [[ -f ~/.bashrc ]]; then
-		echo "Adding \"source $bash_dirname/.bashrc\" to ~/.bashrc"
+		echo "$pgm adding \"source $bash_dirname/.bashrc\" to ~/.bashrc"
 		echo '#Added by ZipSeries:' >> ~/.bashrc
 		echo "[[ -f \"$bash_dirname/.bashrc\" ]] && source \"$bash_dirname/.bashrc\"" >> ~/.bashrc
 	fi
 
 	if [[ -f ~/.zshrc ]]; then
-		echo "Adding \"source $bash_dirname/.zshrc\" to ~/.zshrc"
+		echo "$pgm: adding \"source $bash_dirname/.zshrc\" to ~/.zshrc"
 		echo '#Added by ZipSeries:' >> ~/.zshrc
 		echo "[[ -f \"$bash_dirname/.zshrc\" ]] && source \"$bash_dirname/.zshrc\"" >> ~/.zshrc
 	fi
 fi
 
 if [ "$nocfg" = false ]; then
-	echo Creating if not exists /etc/zipSeries
+	echo $pgm: creating if not exists /etc/zipSeries
 	sudo mkdir -p /etc/zipSeries
 
 	echo Change mode to 700 for /etc/zipSeries

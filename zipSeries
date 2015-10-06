@@ -145,7 +145,6 @@ def main():
 	source_group.add_argument('--source-save-file', 
 		dest='s_save_file',
 		metavar='',
-		type=argparse.FileType('w'), 
 		help='save OS/400 savfile locally all --target-* options will ignored'
 	)
 
@@ -185,7 +184,6 @@ def main():
 	target_group.add_argument('--target-save-file', 
 		dest='t_save_file',
 		metavar='',
-		type=argparse.FileType('w'), 
 		help='restore from OS/400 savfile stored locally all --source-* options will ignored'
 	)
 
@@ -251,7 +249,7 @@ def main():
 
 	as400 = AS400(config)
 	
-	if config['source']['save-file'] == None:
+	if config['target']['save-file'] == None:
 		if config['source']['pwd'] == None:
 			config['source']['pwd'] = getpass.getpass('Enter source user password: ')
 		try:
@@ -261,11 +259,11 @@ def main():
 			sys.stderr.write(str(e) + '\n')
 			sys.exit(1)
 
-	if config['target']['save-file'] == None:
+	if config['source']['save-file'] == None:
 		if config['target']['pwd'] == None:
 			config['target']['pwd'] = getpass.getpass('Enter target user password: ')
 		try:
-			as400.restore(config['source']['save-file'])
+			as400.restore(config['target']['save-file'])
 		except Exception, e:
 			sys.stderr.write('zipSeries: Error happened while restoring savefile:\n');
 			sys.stderr.write(str(e) + '\n')
@@ -275,10 +273,10 @@ def main():
 #  only the passwords can be left blank, they will be prompted later on
 def checkConfig(config):
 	# Source Config
-	# Ignore all other --source-* options if --source-save-file is specified
-	if config['source']['save-file'] != None:
+	# Ignore all --source-* options if --source-save-file is specified
+	if config['target']['save-file'] != None:
 		if config['verbose']:
-			print 'zipSeries: using --source-save-file, all other --source-* options are ignored'
+			print 'zipSeries: using --target-save-file, all --source-* options are ignored'
 	else:
 		if config['source']['srv'] == None:
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-srv=server' + color.END + '\'\n')
@@ -290,10 +288,10 @@ def checkConfig(config):
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr=user' + color.END + '\'\n')
 			sys.exit(1)
 
-	# Ignore all other --source-* options if --source-save-file is specified
-	if config['target']['save-file'] != None:
+	# Ignore all --target-* options if --source-save-file is specified
+	if config['source']['save-file'] != None:
 		if config['verbose']:
-			print 'zipSeries: using --target-save-file, all other --target-* options are ignored'
+			print 'zipSeries: using --target-save-file, all --target-* options are ignored'
 	else:
 		if config['target']['srv'] == None:
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-srv=server' + color.END + '\'\n')
@@ -304,6 +302,7 @@ def checkConfig(config):
 		if config['target']['usr'] == None:
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-U, --target-usr=user' + color.END + '\'\n')
 			sys.exit(1)
+
 # only run if called from command line
 if __name__ == '__main__':
 	main()

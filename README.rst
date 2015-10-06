@@ -27,6 +27,8 @@ MIT license. See the `LICENSE` fil in the distribution.
 zipSeries --help
 ----------------
 
+.. code-block:: 
+
 	$ zipSeries --help
 	usage: usage: zipSeries [--version] | [--help] | [OPTION]...
 
@@ -63,14 +65,17 @@ zipSeries --help
 Install
 =======
 
+.. code-block:: bash
+
 	git clone ssh://github.com/ginkoms/zipSeries
 	cd zipSeries
 	bash install.sh
 
 Make sure that ~/bin is in your `$PATH` variable:
 
-	export PATH="~/bin:$PATH"
+.. code-block:: bash
 
+	export PATH="~/bin:$PATH"
 
 Usage
 =====
@@ -78,13 +83,17 @@ Usage
 Copy single object
 ------------------
 
-	# You will be prompted with password
+.. code-block:: bash
+
+# You will be prompted with password
 	zipSeries \
 		--source-srv server1 --source-usr QSECOFR --source-libl MYLIB --source-obj MYOBJ \
 		--target-srv server2 --target-usr QSECOFR --target-libl MYLIB
 
 Copy whole library
 ------------------
+
+.. code-block:: bash
 
 	# You will be prompted with password
 	zipSeries \
@@ -96,6 +105,8 @@ Making backup
 
 By specifying `--source-save-file file.4zs` you can take local backups
 
+.. code-block:: bash
+
 	# You will be prompted with password
 	zipSeries \
 		--source-srv server1 --source-usr QSECOFR --source-libl MYLIB --source-obj MYOBJ \
@@ -106,6 +117,8 @@ Restoring from backup
 
 By specifying `--target-save-file file.4zs` you can restore from a local backup
 
+.. code-block:: bash
+
 	# You will be prompted with password
 	zipSeries \
 		--target-save-file ~/my_save_file.zs4 \
@@ -115,6 +128,8 @@ Config Files
 ------------
 
 You can create config files to ease tedious backup processes etc, all config files should be stored in /etc/zipSeries and should have the extension .conf:
+
+.. code-block:: bash
 
 	$ cat /etc/zipSeries/server1.conf
 	srv server1

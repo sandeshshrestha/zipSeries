@@ -2,8 +2,6 @@
 zipSeries CLI
 =============
 
-:Author: `Andreas Louv <and@sitemule.com>`_
-
 .. contents::
 	:backlinks: none
 

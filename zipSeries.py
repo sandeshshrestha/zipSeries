@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-# zipSeries 1.2.6
+# zipSeries 0.0.9
 # Copyright (C) 2015 System & Method A/S Denmark
 # Released under the MIT license
 #
 # Written by Andreas Louv <and@sitemule.com>
 
-VERSION = '1.2.6'
+VERSION = '0.0.9'
 
 import sys
 import getpass

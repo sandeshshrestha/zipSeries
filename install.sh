@@ -31,7 +31,7 @@ while (($#)); do
 	shift
 done
 
-echo Compiling zipSeries.py to zipSeries
+echo $pgm: compiling zipSeries.py to zipSeries
 python -m py_compile zipSeries.py
 mv zipSeries.pyc zipSeries
 chmod +x zipSeries

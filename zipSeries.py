@@ -165,7 +165,8 @@ def main():
 			'usr': args.t_usr,
 			'pwd': args.t_pwd, # (optional - will prompt when needed)
 			'libl': args.t_libl,
-			'save-file': args.t_save_file
+			'save-file': args.t_save_file,
+			'restore_cmd': ''
 		}
 	}
 

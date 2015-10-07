@@ -178,6 +178,14 @@ def main():
 
 	check_config(config)
 
+	# if no --target-save-file is specified and no --source-obj is specified
+	#   there should be prompted for an object, simply because thats what you
+	#   usually wants. Make sure that you can still export a full library
+	if config['target']['save-file'] == None and config['source']['obj'] == None:
+		obj = raw_input('Enter object to save (leave blank for libl): ')
+		if obj != '':
+			config['source']['obj'] = obj
+
 	as400 = AS400(config)
 	
 	if config['target']['save-file'] == None:

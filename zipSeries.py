@@ -10,7 +10,7 @@ VERSION = '0.0.9'
 
 import sys
 import getpass
-from src.config import RELEASE_LIST, OBJECT_TYPE_LIST
+from src.config import RELEASE_LIST, OBJECT_TYPE_LIST, PGM_DESCRIPTION
 from src.color import color
 from src.AS400 import AS400
 from src.config_handler import read_config_file, check_config
@@ -26,10 +26,10 @@ def print_version():
 def main():
 	import argparse
 	parser = argparse.ArgumentParser(
-		description='Copy libraries / objects from one iSeries (AS/400) to another running the same (or lower) release of OS/400 as source.', 
 		usage='usage: zipSeries [--version] | [--help] | [OPTION]...',
 		formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=100),
-		add_help=False
+		add_help=False,
+		description=PGM_DESCRIPTION
 	)
 
 	source_group = parser.add_argument_group('source options')

@@ -1,0 +1,1 @@
+QSYS/SAVOBJ OBJ(&obj) LIB(&libl) DEV(*SAVF) SAVF(QTEMP/ZS) TGTRLS(&release)

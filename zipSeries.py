@@ -192,21 +192,14 @@ def main():
 	if config['target']['save-file'] == None:
 		if config['source']['pwd'] == None:
 			config['source']['pwd'] = getpass.getpass('Enter source user password: ')
-		try:
-			as400.save()
-		except Exception, e:
-			sys.stderr.write('zipSeries: Error happened while making savefile:\n');
-			sys.stderr.write(str(e) + '\n')
-			sys.exit(1)
+		
+		as400.save()
 
 	if config['source']['save-file'] == None:
 		if config['target']['pwd'] == None:
 			config['target']['pwd'] = getpass.getpass('Enter target user password: ')
-		try:
+		
 			as400.restore(config['target']['save-file'])
-		except Exception, e:
-			sys.stderr.write('zipSeries: Error happened while restoring savefile:\n');
-			sys.stderr.write(str(e) + '\n')
 			sys.exit(1)
 
 # only run if called from command line

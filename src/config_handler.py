@@ -24,7 +24,7 @@ def check_config(config):
 	# Ignore all --target-* options if --source-save-file is specified
 	if config['source']['save-file'] != None:
 		if config['verbose']:
-			print 'zipSeries: using --target-save-file, all --target-* options are ignored'
+			print 'zipSeries: using --source-save-file, all --source-* options are ignored'
 	else:
 		if config['target']['srv'] == None:
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-srv server' + color.END + '\'\n')
@@ -87,7 +87,10 @@ def parse_config_file(config, l_config, file, f_config):
 					msg = 'object type not supported: \'' + value + '\', supported types: \'' + (', '.join(OBJECT_TYPE_LIST)) + '\''
 					
 				else:
-					l_config[key] = value
+					if l_config[key] != None:
+						print 'zipSeries: key \'' + key + '\' is not used, allready set to \'' + l_config[key] + '\''
+					else:
+						l_config[key] = value
 					# Continue the iteration to prevent the error fallthough
 					continue
 			else:

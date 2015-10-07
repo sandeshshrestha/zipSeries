@@ -199,8 +199,7 @@ def main():
 		if config['target']['pwd'] == None:
 			config['target']['pwd'] = getpass.getpass('Enter target user password: ')
 		
-			as400.restore(config['target']['save-file'])
-			sys.exit(1)
+		as400.restore(config['target']['save-file'])
 
 # only run if called from command line
 if __name__ == '__main__':

@@ -30,7 +30,7 @@ def read_ascii(ascii, i, type='str'):
 		i -= 1
 
 	if type == 'int':
-		ret = str(int(ret, 16))	
+		ret = int(ret, 16)
 	elif type == 'str':
 		ret = binascii.unhexlify(ret).rstrip('\x00')
 

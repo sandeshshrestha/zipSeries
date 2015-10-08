@@ -24,7 +24,7 @@ def check_config(config):
 	# Ignore all --target-* options if --source-save-file is specified
 	if config['source']['save-file'] != None:
 		if config['verbose']:
-			print 'zipSeries: using --source-save-file, all --source-* options are ignored'
+			print 'zipSeries: using --source-save-file, all --target-* options are ignored'
 	else:
 		if config['target']['srv'] == None:
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-srv server' + color.END + '\'\n')

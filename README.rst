@@ -69,6 +69,20 @@ Install
 	cd zipSeries
 	bash install.sh
 
+See install help:
+
+.. code-block:: bash
+
+	$ bash install.sh --help
+	usage: install.sh [OPTION]...
+	Install zipSeries CLI on your machine
+
+	      --nosymlink      dont create a symlink in the folder ~/bin
+	      --norc           dont add code to ~/.bashrc and ~/.zshr'
+	      --nocfg          dont create the folder /etc/zipSeries
+	      --help           display this help and exit
+
+
 Make sure that ~/bin is in your `$PATH` variable:
 
 .. code-block:: bash

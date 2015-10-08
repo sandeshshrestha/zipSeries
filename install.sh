@@ -32,16 +32,15 @@ while (($#)); do
 done
 
 echo $pgm: compiling zipSeries.py to zipSeries
-python -m py_compile zipSeries.py
-mv zipSeries.pyc zipSeries
-chmod +x zipSeries
 
 if [ "$nosymlink" = false ]; then
 	echo $pgm: creating if not exists ~/bin
 	mkdir -p ~/bin
 
-	echo $pgm: making symlink to ~/bin/zipSeries for $bash_dirname/zipSeries
-	ln -s "$bash_dirname/zipSeries" ~/bin/zipSeries
+	# Remove old zipSeries
+	[[ -f ~/bin/zipSeries ]] && echo $pgm: removing ~/bin/zipSeries && rm ~/bin/zipSeries
+	ln -s "$bash_dirname/zipSeries.py" ~/bin/zipSeries && echo $pgm: making symlink to ~/bin/zipSeries for $bash_dirname/zipSeries.py
+	chmod +x ~/bin/zipSeries
 fi
 
 if [ "$norc" = false ]; then

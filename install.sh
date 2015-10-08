@@ -53,7 +53,7 @@ if [ "$nosymlink" = false ]; then
 		echo $pgm: creating wrapper command for $link
 
 		echo "#!/usr/bin/env bash" > $link
-		echo "python \"$target\" $@" >> $link
+		echo "python \"$target\" \$@" >> $link
 	else
 		echo $pgm: making symlink to $link for $target
 		ln -s "$target" "$link"

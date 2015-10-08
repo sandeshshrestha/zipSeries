@@ -307,6 +307,8 @@ class AS400:
 						'rstlib': self.target['lib']
 					}))
 
+				# TODO Run restore command if specified
+
 			except Exception as e:
 				sys.stderr.write('zipSeries: error: ' + str(e) + '\n')
 				sys.stderr.write('zipSeries: JOBLOG: \n')

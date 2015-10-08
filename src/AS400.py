@@ -124,17 +124,23 @@ class AS400:
 		return meta
 
 	def __create_save_file(self, root_dir):
-		# TODO Write FTP script
-
 		as_ifs_save_file = 'zipSeries-' + str(uuid.uuid1()) + '.savf'
 		tmp_file = root_dir + '/' + 'file.tmp'
 
 		try: 
+			if self.config['verbose']:
+				print 'zipSeries: connection to ' + self.source['srv']
+
 			ftp = FTP(self.source['srv'])
+			
 			ftp.set_pasv(True)
 			ftp.set_debuglevel(0)
+
 			ftp.login(user=self.source['usr'], passwd=self.source['pwd'])
 	
+			if self.config['verbose']:
+				print 'zipSeries: connected to ' + self.source['srv']
+
 			try: 
 				ftp.voidcmd('site namefmt 1')
 				ftp.voidcmd('RCMD ' + self.cl('crtsavf'))
@@ -164,6 +170,8 @@ class AS400:
 				sys.stderr.write('zipSeries: error: ' + str(e) + '\n')
 				sys.stderr.write('zipSeries: JOBLOG: \n')
 			
+				# TODO display job log
+				sys.exit(1)
 				ftp.voidcmd('RCMD ' + self.cl('dspjoblog'))
 				ftp.voidcmd('RCMD ' + self.cl('crtpf'))
 				ftp.voidcmd('RCMD ' + self.cl('cpysplf'))
@@ -221,7 +229,7 @@ class AS400:
 
 	def save(self):
 		# save_file is the file which the AS/400 library / object should be saved to
-		self.save_file = ('/tmp/zipSeries-' + str(uuid.uuid1()) + '.4zs') if self.source['save-file'] == '' else self.source['save-file']
+		self.save_file = ('/tmp/zipSeries-' + str(uuid.uuid1()) + '.4zs') if self.source['save-file'] == None else self.source['save-file']
 	
 		root_dir = '/tmp/zipSeries-' + str(uuid.uuid1());
 
@@ -258,7 +266,71 @@ class AS400:
 	
 		meta['restore_file'] = glob.glob(root_dir + '/*.tmp')[0]
 
-		# TODO Write FTP script
+		as_ifs_save_file = '/tmp/zipSeries-' + str(uuid.uuid1()) + '.savf'
 		
+		try: 
+			if self.config['verbose']:
+				print 'zipSeries: connection to ' + self.target['srv']
+
+			ftp = FTP(self.target['srv'])
+			
+			ftp.set_pasv(True)
+			ftp.set_debuglevel(0)
+
+			ftp.login(user=self.target['usr'], passwd=self.target['pwd'])
+	
+			if self.config['verbose']:
+				print 'zipSeries: connected to ' + self.target['srv']
+
+			try: 
+				ftp.voidcmd('site namefmt 1')
+
+				ftp.storbinary('STOR ' + as_ifs_save_file, open(meta['restore_file'], 'r'))
+
+				ftp.voidcmd('RCMD ' + self.cl('cpyfrmstmf', {
+					'fromstmf': as_ifs_save_file
+				}, quote=['fromstmf']))
+				
+				# Object
+
+				if meta['save_type'] == 1:
+					ftp.voidcmd('RCMD ' + self.cl('rstobj', {
+						'savlib': meta['save_libl'],
+						'rstlib': self.target['libl']
+					}))
+				# Libl
+				else:
+					ftp.voidcmd('RCMD ' + self.cl('rstlib', {
+						'savlib': meta['save_libl'],
+						'rstlib': self.target['libl']
+					}))
+
+			except Exception as e:
+				sys.stderr.write('zipSeries: error: ' + str(e) + '\n')
+				sys.stderr.write('zipSeries: JOBLOG: \n')
+		
+				# TODO display job log
+				sys.exit(1)
+				ftp.voidcmd('RCMD ' + self.cl('dspjoblog'))
+				ftp.voidcmd('RCMD ' + self.cl('crtpf'))
+				ftp.voidcmd('RCMD ' + self.cl('cpysplf'))
+				ftp.voidcmd('RCMD ' + self.cl('cpytostmf', {
+					'frommbr': '/QSYS.LIB/QTEMP.LIB/ZS_ERR.FILE/ZS_ERR.MBR',
+					'tostmf': 'zs_' + str(uuid.uuid1()),
+					'stmfccsid': '1208'
+				}, quote=['frommbr', 'tostmf']))
+				ftp.quit()
+
+				sys.exit(1)
+
+		except Exception as e:
+			sys.stderr.write('zipSeries: error: ' + str(e) + '\n')
+
+		try:
+			ftp.quit()
+		except Exception as e:
+			pass
+
+
 		print self.target
 

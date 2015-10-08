@@ -65,11 +65,13 @@ def main():
 	source_group.add_argument('-o', '--source-obj',
 		dest='s_obj',
 		metavar='',
+		nargs='*',
 		help='set object for the source - leave blank if whole library is saved'
 	)
 	source_group.add_argument('--source-obj-type',
 		dest='s_obj_type',
 		metavar='',
+		nargs='*',
 		choices=OBJECT_TYPE_LIST,
 		help='set object type for the source'
 	)
@@ -160,8 +162,8 @@ def main():
 			'usr': args.s_usr,
 			'pwd': args.s_pwd, # (optional - will prompt when needed)
 			'lib': args.s_lib,
-			'obj': args.s_obj, # (optional)
-			'obj-type': args.s_obj_type,
+			'obj': args.s_obj if args.s_obj != None and len(args.s_obj) else None, # (optional)
+			'obj-type': args.s_obj_type if args.s_obj_type != None and len(args.s_obj_type) else [OBJECT_TYPE_LIST[0]],
 			'save-file': args.s_save_file
 		},
 		'target': {
@@ -175,7 +177,6 @@ def main():
 		}
 	}
 
-
 	if args.s_config:
 		read_config_file(config, config['source'], '/etc/zipSeries/' + args.s_config + '.conf')
 
@@ -188,9 +189,9 @@ def main():
 	#   there should be prompted for an object, simply because thats what you
 	#   usually wants. Make sure that you can still export a full library
 	if config['target']['save-file'] == None and config['source']['obj'] == None:
-		obj = input('Enter object to save (*NONE = full library): ')
+		obj = input('Enter object to save (*NONE = full library, space for multiply objects): ')
 		if obj != '' and obj != '*NONE':
-			config['source']['obj'] = obj
+			config['source']['obj'] = obj.split(' ')
 
 	as400 = AS400(config)
 

@@ -21,6 +21,18 @@ def check_config(config):
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr user' + color.END + '\'\n')
 			sys.exit(1)
 
+		# Make sure that --source-obj and --source-obj-type are the same length,
+		#   there should be defaulted with *ALL?
+		obj_type_len = len(config['source']['obj-type'])
+		if config['source']['obj'] and obj_type_len < len(config['source']['obj']):
+
+			while obj_type_len < len(config['source']['obj']):
+				if config['verbose']:
+					print('zipSeries: no object type specified for object \'' + config['source']['obj'][obj_type_len] + '\' defaults to \'*ALL\'')
+				
+				config['source']['obj-type'].append('*ALL')
+				obj_type_len += 1
+
 	# Ignore all --target-* options if --source-save-file is specified
 	if config['source']['save-file'] != None:
 		if config['verbose']:
@@ -83,6 +95,8 @@ def parse_config_file(config, l_config, file, f_config):
 
 				if key == 'release' and value not in RELEASE_LIST:
 					msg = 'release not supported: \'' + value + '\', supported releases: \'' + (', '.join(RELEASE_LIST)) + '\''
+				
+				# TODO Support a space seperated list of object types
 				elif key == 'obj-type' and value not in OBJECT_TYPE_LIST:
 					msg = 'object type not supported: \'' + value + '\', supported types: \'' + (', '.join(OBJECT_TYPE_LIST)) + '\''
 
@@ -90,7 +104,10 @@ def parse_config_file(config, l_config, file, f_config):
 					if l_config[key] != None:
 						print('zipSeries: key \'' + key + '\' is not used, allready set to \'' + l_config[key] + '\'')
 					else:
-						l_config[key] = value
+						if key == 'obj' or key == 'obj-type':
+							l_config[key] = value.split(' ')
+						else:
+							l_config[key] = value
 					# Continue the iteration to prevent the error fallthough
 					continue
 			else:

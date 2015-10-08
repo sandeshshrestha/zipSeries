@@ -330,7 +330,3 @@ class AS400:
 			ftp.quit()
 		except Exception as e:
 			pass
-
-
-		print self.target
-

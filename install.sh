@@ -37,9 +37,27 @@ if [ "$nosymlink" = false ]; then
 	echo $pgm: creating if not exists ~/bin
 	mkdir -p ~/bin
 
+	is_windows() { [[ -n "$WINDIR" ]]; }
+
 	# Remove old zipSeries
 	[[ -f ~/bin/zipSeries ]] && echo $pgm: removing ~/bin/zipSeries && rm ~/bin/zipSeries
-	ln -s "$bash_dirname/zipSeries.py" ~/bin/zipSeries && echo $pgm: making symlink to ~/bin/zipSeries for $bash_dirname/zipSeries.py
+	
+	link="~/bin/zipSeries"
+	target="$bash_dirname/zipSeries.py"
+
+	# Support zipSeries in git bash
+	# Source: https://stackoverflow.com/questions/18641864/git-bash-shell-fails-to-create-symbolic-links
+	if is_windows; then
+		cmd <<< "mklink /D \"${link%/}\" \"${target%/}\"" > /dev/null 
+	else
+		ln -s "$target" "$link"
+	fi
+
+	if [[ "$?" != "0" ]]; then
+		>&2 echo $pgm: error: cannot create symlink to ~/bin/zipSeries for $bash_dirname/zipSeries.py
+		exit 1
+	fi
+	echo $pgm: making symlink to ~/bin/zipSeries for $bash_dirname/zipSeries.py
 	chmod +x ~/bin/zipSeries
 fi
 
@@ -60,7 +78,10 @@ fi
 if [ "$nocfg" = false ]; then
 	echo $pgm: creating if not exists /etc/zipSeries
 	sudo mkdir -p /etc/zipSeries
-
+	if [[ "$?" != "0" ]]; then
+		>&2 echo $pgm: error: cannot create /etc/zipSeries
+		exit 1
+	fi
 	echo Change mode to 700 for /etc/zipSeries
 	sudo chmod 700 /etc/zipSeries
 fi

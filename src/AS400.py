@@ -83,7 +83,7 @@ class AS400:
 		cmd = cmd.strip()
 
 		if self.config['verbose']:
-			print 'zipSeries: running iSeries (AS/400) command: ' + cmd
+			print('zipSeries: running iSeries (AS/400) command: ' + cmd)
 
 		return cmd
 
@@ -110,16 +110,16 @@ class AS400:
 		}
 
 		if self.config['verbose']:
-			print 'zipSeries: save file config:'
-			print '    version: \'' + str(meta['version']) + '\''
-			print '    checksum: \'' + str(meta['checksum']) + '\''
-			print '    save_lib: \'' + str(meta['save_lib']) + '\''
-			print '    save_type: \'' + str(meta['save_type']) + '\''
-			print '    upgrade_from: \'' + str(meta['upgrade_from']) + '\''
-			print '    saved_by: \'' + str(meta['saved_by']) + '\''
-			print '    save_timestamp: \'' + str(meta['save_timestamp']) + '\''
-			print '    release: \'' + str(meta['release']) + '\''
-			print '    restore_cmd: \'' + str(meta['restore_cmd']) + '\''
+			print('zipSeries: save file config:')
+			print('    version: \'' + str(meta['version']) + '\'')
+			print('    checksum: \'' + str(meta['checksum']) + '\'')
+			print('    save_lib: \'' + str(meta['save_lib']) + '\'')
+			print('    save_type: \'' + str(meta['save_type']) + '\'')
+			print('    upgrade_from: \'' + str(meta['upgrade_from']) + '\'')
+			print('    saved_by: \'' + str(meta['saved_by']) + '\''
+			print('    save_timestamp: \'' + str(meta['save_timestamp']) + '\'')
+			print('    release: \'' + str(meta['release']) + '\''
+			print('    restore_cmd: \'' + str(meta['restore_cmd']) + '\'')
 
 		return meta
 
@@ -129,7 +129,7 @@ class AS400:
 
 		try:
 			if self.config['verbose']:
-				print 'zipSeries: connection to ' + self.source['svr']
+				print('zipSeries: connection to ' + self.source['svr'])
 
 			ftp = FTP(self.source['svr'])
 
@@ -139,7 +139,7 @@ class AS400:
 			ftp.login(user=self.source['usr'], passwd=self.source['pwd'])
 
 			if self.config['verbose']:
-				print 'zipSeries: connected to ' + self.source['svr']
+				print('zipSeries: connected to ' + self.source['svr'])
 
 			try:
 				ftp.voidcmd('site namefmt 1')
@@ -260,7 +260,7 @@ class AS400:
 		unzip_file(save_file, dest=root_dir)
 
 		if self.config['verbose']:
-			print 'zipSeries: unzipping \'' + save_file + '\' to \'' + root_dir + '\''
+			print('zipSeries: unzipping \'' + save_file + '\' to \'' + root_dir + '\'')
 
 		meta = self.__parse_ascii(list(read_file_ascii(root_dir + '/' + INFO_FILE)))
 
@@ -270,7 +270,7 @@ class AS400:
 
 		try:
 			if self.config['verbose']:
-				print 'zipSeries: connection to ' + self.target['svr']
+				print('zipSeries: connection to ' + self.target['svr'])
 
 			ftp = FTP(self.target['svr'])
 
@@ -280,7 +280,7 @@ class AS400:
 			ftp.login(user=self.target['usr'], passwd=self.target['pwd'])
 
 			if self.config['verbose']:
-				print 'zipSeries: connected to ' + self.target['svr']
+				print('zipSeries: connected to ' + self.target['svr'])
 
 			try:
 				ftp.voidcmd('site namefmt 1')

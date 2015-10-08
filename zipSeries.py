@@ -16,12 +16,12 @@ from src.AS400 import AS400
 from src.config_handler import read_config_file, check_config
 
 def print_version():
-	print 'zipSeries ' + VERSION
-	print ''
-	print 'Copyright (C) 2015 System & Method A/S Denmark'
-	print 'Released under the MIT license'
-	print ''
-	print 'Written by Andreas Louv <and@sitemule.com>'
+	print('zipSeries ' + VERSION)
+	print('')
+	print('Copyright (C) 2015 System & Method A/S Denmark')
+	print('Released under the MIT license')
+	print('')
+	print('Written by Andreas Louv <and@sitemule.com>')
 
 def main():
 	import argparse

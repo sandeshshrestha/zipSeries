@@ -9,7 +9,7 @@ def check_config(config):
 	# Ignore all --source-* options if --source-save-file is specified
 	if config['target']['save-file'] != None:
 		if config['verbose']:
-			print 'zipSeries: using --target-save-file, all --source-* options are ignored'
+			print('zipSeries: using --target-save-file, all --source-* options are ignored')
 	else:
 		if config['source']['svr'] == None:
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-svr server' + color.END + '\'\n')
@@ -24,7 +24,7 @@ def check_config(config):
 	# Ignore all --target-* options if --source-save-file is specified
 	if config['source']['save-file'] != None:
 		if config['verbose']:
-			print 'zipSeries: using --source-save-file, all --target-* options are ignored'
+			print('zipSeries: using --source-save-file, all --target-* options are ignored')
 	else:
 		if config['target']['svr'] == None:
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-svr server' + color.END + '\'\n')
@@ -60,7 +60,7 @@ def read_config_file(config, l_config, file, sudo=False):
 def parse_config_file(config, l_config, file, f_config):
 
 	if config['verbose']:
-		print 'zipSeries: Parsing config file: ' + file
+		print('zipSeries: Parsing config file: ' + file)
 
 	for i, line in enumerate(f_config):
 		line = line.strip()
@@ -79,7 +79,7 @@ def parse_config_file(config, l_config, file, f_config):
 			if key in ['release', 'svr', 'usr', 'pwd', 'lib', 'obj', 'obj-type']:
 
 				if config['verbose']:
-					print '    setting key \'' + key + '\': \'' + value + '\''
+					print('    setting key \'' + key + '\': \'' + value + '\'')
 
 				if key == 'release' and value not in RELEASE_LIST:
 					msg = 'release not supported: \'' + value + '\', supported releases: \'' + (', '.join(RELEASE_LIST)) + '\''
@@ -88,7 +88,7 @@ def parse_config_file(config, l_config, file, f_config):
 
 				else:
 					if l_config[key] != None:
-						print 'zipSeries: key \'' + key + '\' is not used, allready set to \'' + l_config[key] + '\''
+						print('zipSeries: key \'' + key + '\' is not used, allready set to \'' + l_config[key] + '\'')
 					else:
 						l_config[key] = value
 					# Continue the iteration to prevent the error fallthough

@@ -35,30 +35,30 @@ def main():
 	source_group = parser.add_argument_group('source options')
 	target_group = parser.add_argument_group('target options')
 	general_group = parser.add_argument_group('options')
-	
+
 	# Source
-	source_group.add_argument('-s', '--source-srv', 
-		dest='s_srv',
+	source_group.add_argument('-s', '--source-svr',
+		dest='s_svr',
 		metavar='',
 		help='set server for the source'
 	)
-	source_group.add_argument('-u', '--source-usr', 
-		dest='s_usr', 
+	source_group.add_argument('-u', '--source-usr',
+		dest='s_usr',
 		metavar='',
 		help='set user profile for the source'
 	)
-	source_group.add_argument('-p', '--source-pwd', 
-		dest='s_pwd', 
+	source_group.add_argument('-p', '--source-pwd',
+		dest='s_pwd',
 		metavar='',
 		help='set user password for the source'
 	)
-	source_group.add_argument('-l', '--source-libl', 
-		dest='s_libl', 
+	source_group.add_argument('-l', '--source-lib',
+		dest='s_lib',
 		metavar='',
 		help='set library for the source'
 	)
-	source_group.add_argument('-o', '--source-obj', 
-		dest='s_obj', 
+	source_group.add_argument('-o', '--source-obj',
+		dest='s_obj',
 		metavar='',
 		help='set object for the source - leave blank if whole library is saved'
 	)
@@ -68,73 +68,73 @@ def main():
 		choices=OBJECT_TYPE_LIST,
 		help='set object type for the source'
 	)
-	source_group.add_argument('-c', '--source-config', 
+	source_group.add_argument('-c', '--source-config',
 		dest='s_config',
 		metavar='',
 		help='read source config from file'
 	)
-	source_group.add_argument('--source-save-file', 
+	source_group.add_argument('--source-save-file',
 		dest='s_save_file',
 		metavar='',
 		help='save OS/400 savfile locally all --target-* options will ignored'
 	)
 
 	# Target
-	target_group.add_argument('--target-release', 
+	target_group.add_argument('--target-release',
 		default='*CURRENT',
 		metavar='',
 		choices=RELEASE_LIST,
-		dest='t_release', 
+		dest='t_release',
 		help='set OS/400 release for the target'
 	)
-	target_group.add_argument('-S', '--target-srv', 
-		dest='t_srv', 
+	target_group.add_argument('-S', '--target-svr',
+		dest='t_svr',
 		metavar='',
 		help='set server for the target'
 	)
-	target_group.add_argument('-U', '--target-usr', 
-		dest='t_usr', 
+	target_group.add_argument('-U', '--target-usr',
+		dest='t_usr',
 		metavar='',
 		help='set user profile for the target'
 	)
-	target_group.add_argument('-P', '--target-pwd', 
-		dest='t_pwd', 
+	target_group.add_argument('-P', '--target-pwd',
+		dest='t_pwd',
 		metavar='',
 		help='set user password for the target'
 	)
-	target_group.add_argument('-L', '--target-libl', 
-		dest='t_libl', 
+	target_group.add_argument('-L', '--target-lib',
+		dest='t_lib',
 		metavar='',
 		help='set library for the target'
 	)
-	target_group.add_argument('-C', '--target-config', 
-		dest='t_config', 
+	target_group.add_argument('-C', '--target-config',
+		dest='t_config',
 		metavar='',
 		help='read target config from file'
 	)
-	target_group.add_argument('--target-save-file', 
+	target_group.add_argument('--target-save-file',
 		dest='t_save_file',
 		metavar='',
 		help='restore from OS/400 savfile stored locally all --source-* options will ignored'
 	)
 
 	# General
-	general_group.add_argument('-v', '--verbose', 
-		dest='verbose', 
-		action='store_true', 
-		default=False, 
+	general_group.add_argument('-v', '--verbose',
+		dest='verbose',
+		action='store_true',
+		default=False,
 		help='be more verbose/talkative during the operation'
 	)
-	general_group.add_argument('--version', 
-		dest='version', 
-		action='store_true', 
-		default=False, 
+	general_group.add_argument('--version',
+		dest='version',
+		action='store_true',
+		default=False,
 		help='output version information and exit'
 	)
-	general_group.add_argument('--help', 
-		dest='help', 
-		action='store_true', 
-		default=False, 
+	general_group.add_argument('--help',
+		dest='help',
+		action='store_true',
+		default=False,
 		help='show this help message and exit'
 	)
 
@@ -151,20 +151,20 @@ def main():
 		# when verbose is True zipSeries will print information about the programs workfow
 		'verbose': args.verbose,
 		'source': {
-			'srv': args.s_srv,
+			'svr': args.s_svr,
 			'usr': args.s_usr,
 			'pwd': args.s_pwd, # (optional - will prompt when needed)
-			'libl': args.s_libl,
+			'lib': args.s_lib,
 			'obj': args.s_obj, # (optional)
 			'obj-type': args.s_obj_type,
 			'save-file': args.s_save_file
 		},
 		'target': {
 			'release': args.t_release,
-			'srv': args.t_srv,
+			'svr': args.t_svr,
 			'usr': args.t_usr,
 			'pwd': args.t_pwd, # (optional - will prompt when needed)
-			'libl': args.t_libl,
+			'lib': args.t_lib,
 			'save-file': args.t_save_file,
 			'restore_cmd': ''
 		}
@@ -183,22 +183,22 @@ def main():
 	#   there should be prompted for an object, simply because thats what you
 	#   usually wants. Make sure that you can still export a full library
 	if config['target']['save-file'] == None and config['source']['obj'] == None:
-		obj = raw_input('Enter object to save (leave blank for libl): ')
+		obj = raw_input('Enter object to save (leave blank for lib): ')
 		if obj != '':
 			config['source']['obj'] = obj
 
 	as400 = AS400(config)
-	
+
 	if config['target']['save-file'] == None:
 		if config['source']['pwd'] == None:
 			config['source']['pwd'] = getpass.getpass('Enter source user password: ')
-		
+
 		as400.save()
 
 	if config['source']['save-file'] == None:
 		if config['target']['pwd'] == None:
 			config['target']['pwd'] = getpass.getpass('Enter target user password: ')
-		
+
 		as400.restore(config['target']['save-file'])
 
 # only run if called from command line

@@ -11,11 +11,11 @@ def check_config(config):
 		if config['verbose']:
 			print 'zipSeries: using --target-save-file, all --source-* options are ignored'
 	else:
-		if config['source']['srv'] == None:
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-srv server' + color.END + '\'\n')
+		if config['source']['svr'] == None:
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-svr server' + color.END + '\'\n')
 			sys.exit(1)
-		if config['source']['libl'] == None:
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-l, --source-libl library' + color.END + '\'\n')
+		if config['source']['lib'] == None:
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-l, --source-lib library' + color.END + '\'\n')
 			sys.exit(1)
 		if config['source']['usr'] == None:
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr user' + color.END + '\'\n')
@@ -26,11 +26,11 @@ def check_config(config):
 		if config['verbose']:
 			print 'zipSeries: using --source-save-file, all --target-* options are ignored'
 	else:
-		if config['target']['srv'] == None:
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-srv server' + color.END + '\'\n')
+		if config['target']['svr'] == None:
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-svr server' + color.END + '\'\n')
 			sys.exit(1)
-		if config['target']['libl'] == None:
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-L, --target-libl library' + color.END + '\'\n')
+		if config['target']['lib'] == None:
+			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-L, --target-lib library' + color.END + '\'\n')
 			sys.exit(1)
 		if config['target']['usr'] == None:
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-U, --target-usr user' + color.END + '\'\n')
@@ -76,7 +76,7 @@ def parse_config_file(config, l_config, file, f_config):
 			key = line[0:split_index]
 			value = line[split_index+1:]
 
-			if key in ['release', 'srv', 'usr', 'pwd', 'libl', 'obj', 'obj-type']:
+			if key in ['release', 'svr', 'usr', 'pwd', 'lib', 'obj', 'obj-type']:
 
 				if config['verbose']:
 					print '    setting key \'' + key + '\': \'' + value + '\''
@@ -85,7 +85,7 @@ def parse_config_file(config, l_config, file, f_config):
 					msg = 'release not supported: \'' + value + '\', supported releases: \'' + (', '.join(RELEASE_LIST)) + '\''
 				elif key == 'obj-type' and value not in OBJECT_TYPE_LIST:
 					msg = 'object type not supported: \'' + value + '\', supported types: \'' + (', '.join(OBJECT_TYPE_LIST)) + '\''
-					
+
 				else:
 					if l_config[key] != None:
 						print 'zipSeries: key \'' + key + '\' is not used, allready set to \'' + l_config[key] + '\''

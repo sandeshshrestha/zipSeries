@@ -25,7 +25,7 @@ MIT license. See the `LICENSE` fil in the distribution.
 zipSeries --help
 ----------------
 
-.. code-block:: 
+.. code-block::
 
 	$ zipSeries --help
 	usage: usage: zipSeries [--version] | [--help] | [OPTION]...
@@ -34,10 +34,10 @@ zipSeries --help
 	(or lower) release of OS/400 as source.
 
 	source options:
-	  -s , --source-srv      set server for the source
+	  -s , --source-svr      set server for the source
 	  -u , --source-usr      set user profile for the source
 	  -p , --source-pwd      set user password for the source
-	  -l , --source-libl     set library for the source
+	  -l , --source-lib      set library for the source
 	  -o , --source-obj      set object for the source - leave blank if whole
 	                         library is saved
 	  --source-obj-type      set object type for the source
@@ -47,10 +47,10 @@ zipSeries --help
 
 	target options:
 	  --target-release       set OS/400 release for the target
-	  -S , --target-srv      set server for the target
+	  -S , --target-svr      set server for the target
 	  -U , --target-usr      set user profile for the target
 	  -P , --target-pwd      set user password for the target
-	  -L , --target-libl     set library for the target
+	  -L , --target-lib      set library for the target
 	  -C , --target-config   read target config from file
 	  --target-save-file     restore from OS/400 savfile stored locally all
 	                         --source-* options will ignored
@@ -85,8 +85,8 @@ Copy single object
 
 	# You will be prompted with password
 	zipSeries \
-		--source-srv server1 --source-usr QSECOFR --source-libl MYLIB --source-obj MYOBJ \
-		--target-srv server2 --target-usr QSECOFR --target-libl MYLIB
+		--source-svr server1 --source-usr QSECOFR --source-lib MYLIB --source-obj MYOBJ \
+		--target-svr server2 --target-usr QSECOFR --target-lib MYLIB
 
 Copy whole library
 ------------------
@@ -95,8 +95,8 @@ Copy whole library
 
 	# You will be prompted with password
 	zipSeries \
-		--source-srv server1 --source-usr QSECOFR --source-libl MYLIB \
-		--target-srv server2 --target-usr QSECOFR --target-libl MYLIB
+		--source-svr server1 --source-usr QSECOFR --source-lib MYLIB \
+		--target-svr server2 --target-usr QSECOFR --target-lib MYLIB
 
 Making backup
 -------------
@@ -107,7 +107,7 @@ By specifying `--source-save-file file.4zs` you can take local backups
 
 	# You will be prompted with password
 	zipSeries \
-		--source-srv server1 --source-usr QSECOFR --source-libl MYLIB --source-obj MYOBJ \
+		--source-svr server1 --source-usr QSECOFR --source-lib MYLIB --source-obj MYOBJ \
 		--source-save-file ~/my_save_file.zs4
 
 Restoring from backup
@@ -120,7 +120,7 @@ By specifying `--target-save-file file.4zs` you can restore from a local backup
 	# You will be prompted with password
 	zipSeries \
 		--target-save-file ~/my_save_file.zs4 \
-		--target-srv server --target-usr QSECOFR --target-libl MYLIB
+		--target-svr server --target-usr QSECOFR --target-lib MYLIB
 
 Config Files
 ------------
@@ -130,10 +130,10 @@ You can create config files to ease tedious backup processes etc, all config fil
 .. code-block:: bash
 
 	$ cat /etc/zipSeries/server1.conf
-	srv server1
+	svr server1
 	usr QSECOFR
 	pwd secret
-	libl MYLIB
+	lib MYLIB
 	obj MYOBJ
 
 	$ zipSeries \

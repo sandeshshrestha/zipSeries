@@ -15,6 +15,11 @@ from src.color import color
 from src.AS400 import AS400
 from src.config_handler import read_config_file, check_config
 
+# Python 3: raw_input() was renamed to input()
+# Source: http://stackoverflow.com/a/7321970/887539
+try: input = raw_input
+except NameError: pass
+
 def print_version():
 	print('zipSeries ' + VERSION)
 	print('')
@@ -183,8 +188,8 @@ def main():
 	#   there should be prompted for an object, simply because thats what you
 	#   usually wants. Make sure that you can still export a full library
 	if config['target']['save-file'] == None and config['source']['obj'] == None:
-		obj = raw_input('Enter object to save (leave blank for lib): ')
-		if obj != '':
+		obj = input('Enter object to save (*NONE = full library): ')
+		if obj != '' and obj != '*NONE':
 			config['source']['obj'] = obj
 
 	as400 = AS400(config)

@@ -1,6 +1,6 @@
 import sys
 import subprocess
-from color import color
+from src.color import color
 
 # check_config makes sure that all config options are specified.
 #  only the passwords can be left blank, they will be prompted later on
@@ -47,7 +47,7 @@ def read_config_file(config, l_config, file, sudo=False):
 	try:
 		f_config = subprocess.check_output(cmd, stderr=subprocess.STDOUT).splitlines()
 
-	except Exception, e:
+	except Exception as e:
 		if not sudo:
 			return read_config_file(config, l_config, file, True)
 		else:

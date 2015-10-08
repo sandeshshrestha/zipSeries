@@ -6,7 +6,7 @@ import glob
 import os
 from ftplib import FTP
 
-from config import UPGRADE_FROM, PGM_DESCRIPTION
+from src.config import UPGRADE_FROM, PGM_DESCRIPTION
 
 INFO_FILE = 'zipInfo.4zi';
 
@@ -116,9 +116,9 @@ class AS400:
 			print('    save_lib: \'' + str(meta['save_lib']) + '\'')
 			print('    save_type: \'' + str(meta['save_type']) + '\'')
 			print('    upgrade_from: \'' + str(meta['upgrade_from']) + '\'')
-			print('    saved_by: \'' + str(meta['saved_by']) + '\''
+			print('    saved_by: \'' + str(meta['saved_by']) + '\'')
 			print('    save_timestamp: \'' + str(meta['save_timestamp']) + '\'')
-			print('    release: \'' + str(meta['release']) + '\''
+			print('    release: \'' + str(meta['release']) + '\'')
 			print('    restore_cmd: \'' + str(meta['restore_cmd']) + '\'')
 
 		return meta

@@ -306,7 +306,11 @@ class AS400:
 						'rstlib': self.target['lib']
 					}))
 
-				# TODO Run restore command if specified
+				# Run restore command if specified
+				if meta['restore_cmd'] != '':
+					if self.config['verbose']:
+						print('zipSeries: running restore command: ' + meta['restore_cmd'])
+						ftp.voidcmd('RCMD ' + meta['restore_cmd'])
 
 			except Exception as e:
 				sys.stderr.write('zipSeries: error: ' + str(e) + '\n')

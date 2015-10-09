@@ -54,11 +54,14 @@ zipSeries --help
 	  -C , --target-config   read target config from file
 	  --target-save-file     restore from OS/400 savfile stored locally all
 	                         --source-* options will ignored
+	  --target-restore-cmd   command to run when object(s) / library is restored
+	                         on target machine
 
 	options:
 	  -v, --verbose          be more verbose/talkative during the operation
 	  --version              output version information and exit
 	  --help                 show this help message and exit
+
 
 Install
 =======

@@ -1,5 +1,5 @@
 ## Version 1.3
-- [ ] Support post restore command
+- [x] Support post restore command
 - [x] Support multiply objects
    - [x] Support multiply objects from CLI
    - [x] Support multiply objects from config file

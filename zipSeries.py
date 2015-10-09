@@ -124,6 +124,11 @@ def main():
 		metavar='',
 		help='restore from OS/400 savfile stored locally all --source-* options will ignored'
 	)
+	target_group.add_argument('--target-restore-cmd',
+		dest='t_restore_cmd',
+		metavar='',
+		help='command to run when object(s) / library is restored on target machine'
+	)
 
 	# General
 	general_group.add_argument('-v', '--verbose',
@@ -173,7 +178,7 @@ def main():
 			'pwd': args.t_pwd, # (optional - will prompt when needed)
 			'lib': args.t_lib,
 			'save-file': args.t_save_file,
-			'restore_cmd': ''
+			'restore_cmd': args.t_restore_cmd
 		}
 	}
 

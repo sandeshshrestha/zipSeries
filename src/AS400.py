@@ -151,7 +151,6 @@ class AS400:
 						'release': self.target['release']
 					}))
 				else:
-					# TODO Handle multiply objects
 					ftp.voidcmd('RCMD ' + self.cl('savobj', {
 						'obj': ' '.join(self.source['obj']),
 						'objtype': ' '.join(self.source['obj-type']),

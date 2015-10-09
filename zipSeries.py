@@ -65,13 +65,13 @@ def main():
 	source_group.add_argument('-o', '--source-obj',
 		dest='s_obj',
 		metavar='',
-		nargs='*',
+		action='append',
 		help='set object for the source - leave blank if whole library is saved'
 	)
 	source_group.add_argument('--source-obj-type',
 		dest='s_obj_type',
 		metavar='',
-		nargs='*',
+		action='append',
 		choices=OBJECT_TYPE_LIST,
 		help='set object type for the source'
 	)

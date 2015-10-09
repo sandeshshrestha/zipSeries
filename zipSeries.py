@@ -87,7 +87,6 @@ def main():
 
 	# Target
 	target_group.add_argument('--target-release',
-		default='*CURRENT',
 		metavar='',
 		choices=RELEASE_LIST,
 		dest='t_release',
@@ -167,7 +166,7 @@ def main():
 			'pwd': args.s_pwd, # (optional - will prompt when needed)
 			'lib': args.s_lib,
 			'obj': args.s_obj if args.s_obj != None and len(args.s_obj) else None, # (optional)
-			'obj-type': args.s_obj_type if args.s_obj_type != None and len(args.s_obj_type) else [OBJECT_TYPE_LIST[0]],
+			'obj-type': args.s_obj_type if args.s_obj_type != None and len(args.s_obj_type) else None,
 			'save-file': args.s_save_file
 		},
 		'target': {
@@ -187,6 +186,12 @@ def main():
 	if args.t_config:
 		read_config_file(config, config['target'], '/etc/zipSeries/' + args.t_config + '.conf')
 
+	if config['source']['obj-type'] == None:
+		config['source']['obj-type'] = ["*ALL"]
+
+	if config['target']['release'] == None:
+		config['target']['release'] = "*CURRENT"
+	
 	check_config(config)
 
 	# if no --target-save-file is specified and no --source-obj is specified

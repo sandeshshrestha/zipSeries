@@ -1,5 +1,6 @@
 import sys
 import subprocess
+from src.config import RELEASE_LIST, OBJECT_TYPE_LIST 
 
 # check_config makes sure that all config options are specified.
 #  only the passwords can be left blank, they will be prompted later on
@@ -78,9 +79,11 @@ def parse_config_file(config, l_config, file, f_config):
 			key = line[0:split_index]
 			value = line[split_index+1:]
 			
-			if l_config[key] != None:
-				print('zipSeries: key \'' + key + '\' is allready set to \'' + l_config[key] + '\'')
+			if key in l_config and l_config[key] != None:
+				print('zipSeries: key \'' + key + '\' is allready set to \'' + str(l_config[key]) + '\'')
 				continue
+
+			print(line)
 
 			# Release 
 			if key == 'release':
@@ -91,7 +94,7 @@ def parse_config_file(config, l_config, file, f_config):
 
 			# TODO Support a space seperated list of object types
 			elif key == 'obj-type':
-				if value in OBJECT_TYPE_LIST:
+				if any(x in OBJECT_TYPE_LIST for x in value.split(' ')):
 					l_config[key] = value.split(' ')
 				else:
 					err_msg = 'object type not supported: \'' + value + '\', supported types: \'' + (', '.join(OBJECT_TYPE_LIST)) + '\''
@@ -104,7 +107,7 @@ def parse_config_file(config, l_config, file, f_config):
 
 		if err_msg != None:
 			sys.stderr.write('zipSeries: cannot parse \'' + file + '\':\n')
-			sys.stderr.write('Line (' + str(i+1) + '): ' + msg + '\n')
+			sys.stderr.write('Line (' + str(i+1) + '): ' + err_msg + '\n')
 			sys.exit(1)
 
 

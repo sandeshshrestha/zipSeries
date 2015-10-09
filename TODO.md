@@ -5,7 +5,7 @@
    - [x] Support multiply objects from config file
 - [ ] Support multiply object types
    - [x] Support multiply object types from CLI
-   - [ ] Support multiply object types from config file
+   - [x] Support multiply object types from config file
 - [ ] Display job log
    - [ ] Display job log when error occurs on the AS/400
    - [ ] Support CLI option `--job-log` that will echo the job after communiction with the server

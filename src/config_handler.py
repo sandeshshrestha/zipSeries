@@ -21,18 +21,6 @@ def check_config(config):
 			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr user' + color.END + '\'\n')
 			sys.exit(1)
 
-		# Make sure that --source-obj and --source-obj-type are the same length,
-		#   there should be defaulted with *ALL?
-		obj_type_len = len(config['source']['obj-type'])
-		if config['source']['obj'] and obj_type_len < len(config['source']['obj']):
-
-			while obj_type_len < len(config['source']['obj']):
-				if config['verbose']:
-					print('zipSeries: no object type specified for object \'' + config['source']['obj'][obj_type_len] + '\' defaults to \'*ALL\'')
-				
-				config['source']['obj-type'].append('*ALL')
-				obj_type_len += 1
-
 	# Ignore all --target-* options if --source-save-file is specified
 	if config['source']['save-file'] != None:
 		if config['verbose']:

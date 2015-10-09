@@ -11,7 +11,6 @@ VERSION = '1.0.0'
 import sys
 import getpass
 from src.config import RELEASE_LIST, OBJECT_TYPE_LIST, PGM_DESCRIPTION
-from src.color import color
 from src.AS400 import AS400
 from src.config_handler import read_config_file, check_config
 

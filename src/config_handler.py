@@ -1,6 +1,5 @@
 import sys
 import subprocess
-from src.color import color
 
 # check_config makes sure that all config options are specified.
 #  only the passwords can be left blank, they will be prompted later on
@@ -12,13 +11,13 @@ def check_config(config):
 			print('zipSeries: using --target-save-file, all --source-* options are ignored')
 	else:
 		if config['source']['svr'] == None:
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-s, --source-svr server' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'-s, --source-svr server\'\n')
 			sys.exit(1)
 		if config['source']['lib'] == None:
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-l, --source-lib library' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'-l, --source-lib library\'\n')
 			sys.exit(1)
 		if config['source']['usr'] == None:
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-u, --source-usr user' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'-u, --source-usr user\'\n')
 			sys.exit(1)
 
 	# Ignore all --target-* options if --source-save-file is specified
@@ -27,13 +26,13 @@ def check_config(config):
 			print('zipSeries: using --source-save-file, all --target-* options are ignored')
 	else:
 		if config['target']['svr'] == None:
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-S, --target-svr server' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'-S, --target-svr server\'\n')
 			sys.exit(1)
 		if config['target']['lib'] == None:
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-L, --target-lib library' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'-L, --target-lib library\'\n')
 			sys.exit(1)
 		if config['target']['usr'] == None:
-			sys.stderr.write('zipSeries: Missing option: \'' + color.BOLD + '-U, --target-usr user' + color.END + '\'\n')
+			sys.stderr.write('zipSeries: Missing option: \'-U, --target-usr user\'\n')
 			sys.exit(1)
 
 # read_config_file will call itself again with the sudo=True argument,
@@ -51,7 +50,7 @@ def read_config_file(config, l_config, file, sudo=False):
 		if not sudo:
 			return read_config_file(config, l_config, file, True)
 		else:
-			sys.stderr.write('zipSeries: cannot open \'' + color.BOLD + file + color.END + '\' for reading: No such file or directory\n')
+			sys.stderr.write('zipSeries: cannot open \'' + file + '\' for reading: No such file or directory\n')
 			sys.exit(0)
 
 	parse_config_file(config, l_config, file, f_config)
@@ -68,42 +67,44 @@ def parse_config_file(config, l_config, file, f_config):
 		if line == '' or line[0] == '#':
 			continue
 
-		msg = line
+		if config['verbose']:
+			print('zipSeries: processing:' + line)
+
+		err_msg = None
 
 		# If the config line cannot be parsed an error should be written
 		if ' ' in line:
 			split_index = line.index(' ')
 			key = line[0:split_index]
 			value = line[split_index+1:]
+			
+			if l_config[key] != None:
+				print('zipSeries: key \'' + key + '\' is allready set to \'' + l_config[key] + '\'')
+				continue
 
-			if key in ['release', 'svr', 'usr', 'pwd', 'lib', 'obj', 'obj-type']:
-
-				if config['verbose']:
-					print('    setting key \'' + key + '\': \'' + value + '\'')
-
-				if key == 'release' and value not in RELEASE_LIST:
-					msg = 'release not supported: \'' + value + '\', supported releases: \'' + (', '.join(RELEASE_LIST)) + '\''
-				
-				# TODO Support a space seperated list of object types
-				elif key == 'obj-type' and value not in OBJECT_TYPE_LIST:
-					msg = 'object type not supported: \'' + value + '\', supported types: \'' + (', '.join(OBJECT_TYPE_LIST)) + '\''
-
+			# Release 
+			if key == 'release':
+				if value in RELEASE_LIST:
+					l_config[key] = value
 				else:
-					if l_config[key] != None:
-						print('zipSeries: key \'' + key + '\' is not used, allready set to \'' + l_config[key] + '\'')
-					else:
-						if key == 'obj' or key == 'obj-type':
-							l_config[key] = value.split(' ')
-						else:
-							l_config[key] = value
-					# Continue the iteration to prevent the error fallthough
-					continue
-			else:
-				msg = 'key not recornized: \'' + color.BOLD + key + color.END + '\' in line \'' + line + '\''
+					err_msg = 'release not supported: \'' + value + '\', supported releases: \'' + (', '.join(RELEASE_LIST)) + '\''
 
-		# Fallthough to error print
-		sys.stderr.write('zipSeries: cannot parse \'' + color.BOLD + file + color.END + '\':\n')
-		sys.stderr.write('Line (' + str(i+1) + '): ' + msg + '\n')
-		sys.exit(1)
+			# TODO Support a space seperated list of object types
+			elif key == 'obj-type':
+				if value in OBJECT_TYPE_LIST:
+					l_config[key] = value.split(' ')
+				else:
+					err_msg = 'object type not supported: \'' + value + '\', supported types: \'' + (', '.join(OBJECT_TYPE_LIST)) + '\''
+			
+			# Standard values (cannot be validated)
+			elif key in ['svr', 'usr', 'pwd', 'lib', 'obj']:
+				l_config[key] = value
+			else:
+				err_msg = 'key not recornized: \'' + key + '\' in line \'' + line + '\''
+
+		if err_msg != None:
+			sys.stderr.write('zipSeries: cannot parse \'' + file + '\':\n')
+			sys.stderr.write('Line (' + str(i+1) + '): ' + msg + '\n')
+			sys.exit(1)
 
 

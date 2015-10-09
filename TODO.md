@@ -3,7 +3,7 @@
 - [x] Support multiply objects
    - [x] Support multiply objects from CLI
    - [x] Support multiply objects from config file
-- [ ] Support multiply object types
+- [x] Support multiply object types
    - [x] Support multiply object types from CLI
    - [x] Support multiply object types from config file
 - [ ] Display job log

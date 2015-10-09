@@ -15,6 +15,3 @@
 ## Version 1.4
 - [ ] Support pre restore command
 - [ ] Support multiply libraries
-
-## Version 1.5
-- [ ] 

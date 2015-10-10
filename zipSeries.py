@@ -28,7 +28,15 @@ def print_version():
 	print('Written by Andreas Louv <and@sitemule.com>')
 
 def main():
-	import argparse
+	import signal, argparse, getpass
+
+	def gracefull_exit(signum, frame):
+		print('zipSeries: gracefully shutting zipSeries down. Use Ctrl + C in the future')
+		sys.exit(0)
+	
+	signal.signal(signal.SIGINT, lambda signum, frame: sys.exit(0))
+	signal.signal(signal.SIGTSTP, gracefull_exit)
+	
 	parser = argparse.ArgumentParser(
 		usage='usage: zipSeries [--version] | [--help] | [OPTION]...',
 		formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=100),

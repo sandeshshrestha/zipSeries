@@ -143,6 +143,12 @@ def main():
 		default=False,
 		help='be more verbose/talkative during the operation'
 	)
+	general_group.add_argument('--trace',
+		dest='trace',
+		action='store_true',
+		default=False,
+		help='trace commands and other information'
+	)
 	general_group.add_argument('--version',
 		dest='version',
 		action='store_true',
@@ -167,6 +173,7 @@ def main():
 
 	config = {
 		# when verbose is True zipSeries will print information about the programs workfow
+		'trace': args.trace,
 		'verbose': args.verbose,
 		'source': {
 			'svr': args.s_svr,

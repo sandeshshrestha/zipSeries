@@ -59,6 +59,7 @@ zipSeries --help
 
 	options:
 	  -v, --verbose          be more verbose/talkative during the operation
+	  --trace                trace commands and other information
 	  --version              output version information and exit
 	  --help                 show this help message and exit
 

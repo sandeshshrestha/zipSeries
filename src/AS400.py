@@ -19,7 +19,7 @@ def read_file_ascii(file):
 		content = f.read()
 		return binascii.hexlify(content)
 
-def read_ascii(ascii, i, type='str'):
+def read_ascii(ascii, i, type='str', trace=False):
 	ret = ''
 	while i > 0:
 		if type == 'int':
@@ -35,6 +35,9 @@ def read_ascii(ascii, i, type='str'):
 		ret = binascii.unhexlify(ret).rstrip('\x00')
 
 		ret = ret.strip()
+
+	if trace:
+		print('zipSeries: parsing config: ' + ret)
 
 	return ret
 
@@ -82,44 +85,42 @@ class AS400:
 
 		cmd = cmd.strip()
 
-		if self.config['verbose']:
+		if self.config['trace']:
 			print('zipSeries: running iSeries (AS/400) command: ' + cmd)
 
 		return cmd
 
+	def __dspjoblog(self, ftp):
+		ftp.voidcmd('RCMD ' + self.cl('dspjoblog'))
+		ftp.voidcmd('RCMD ' + self.cl('crtpf'))
+		ftp.voidcmd('RCMD ' + self.cl('cpysplf'))
+		ftp.voidcmd('RCMD ' + self.cl('cpytostmf', {
+			'frommbr': '/QSYS.LIB/QTEMP.LIB/ZS_ERR.FILE/ZS_ERR.MBR',
+			'tostmf': 'zs_' + str(uuid.uuid1()),
+			'stmfccsid': '1208'
+		}, quote=['frommbr', 'tostmf']))	
+
 	def __parse_ascii(self, ascii):
 		meta = {
-			'version': read_ascii(ascii, 4, 'int'),
-			'checksum': read_ascii(ascii, 4, 'int'),
-			'save_lib': read_ascii(ascii, 12),
-			'save_type': read_ascii(ascii, 4, 'int'),
-			'upgrade_from': read_ascii(ascii, 256),
-			'saved_by': read_ascii(ascii, 256),
-			'save_timestamp': read_ascii(ascii, 32),
-			'release': read_ascii(ascii, 11),
-			'restore_cmd': read_ascii(ascii, 256),
+			'version': read_ascii(ascii, 4, type='int', trace=self.config['trace']),
+			'checksum': read_ascii(ascii, 4, type='int', trace=self.config['trace']),
+			'save_lib': read_ascii(ascii, 12, trace=self.config['trace']),
+			'save_type': read_ascii(ascii, 4, type='int', trace=self.config['trace']),
+			'upgrade_from': read_ascii(ascii, 256, trace=self.config['trace']),
+			'saved_by': read_ascii(ascii, 256, trace=self.config['trace']),
+			'save_timestamp': read_ascii(ascii, 32, trace=self.config['trace']),
+			'release': read_ascii(ascii, 11, trace=self.config['trace']),
+			'restore_cmd': read_ascii(ascii, 256, trace=self.config['trace']),
 
 			# the below is only used by zipSeries C++ dont use:
-			'_svr': read_ascii(ascii, 256),
-			'_usr': read_ascii(ascii, 11),
-			'_lib': read_ascii(ascii, 11),
-			'_poster_file': read_ascii(ascii, 256),
-			'_poster_link': read_ascii(ascii, 256),
-			'_poster_stretch': read_ascii(ascii, 1),
-			'_tmp_name': read_ascii(ascii, 256)
+			'_svr': read_ascii(ascii, 256, trace=self.config['trace']),
+			'_usr': read_ascii(ascii, 11, trace=self.config['trace']),
+			'_lib': read_ascii(ascii, 11, trace=self.config['trace']),
+			'_poster_file': read_ascii(ascii, 256, trace=self.config['trace']),
+			'_poster_link': read_ascii(ascii, 256, trace=self.config['trace']),
+			'_poster_stretch': read_ascii(ascii, 1, trace=self.config['trace']),
+			'_tmp_name': read_ascii(ascii, 256, trace=self.config['trace'])
 		}
-
-		if self.config['verbose']:
-			print('zipSeries: save file config:')
-			print('    version: \'' + str(meta['version']) + '\'')
-			print('    checksum: \'' + str(meta['checksum']) + '\'')
-			print('    save_lib: \'' + str(meta['save_lib']) + '\'')
-			print('    save_type: \'' + str(meta['save_type']) + '\'')
-			print('    upgrade_from: \'' + str(meta['upgrade_from']) + '\'')
-			print('    saved_by: \'' + str(meta['saved_by']) + '\'')
-			print('    save_timestamp: \'' + str(meta['save_timestamp']) + '\'')
-			print('    release: \'' + str(meta['release']) + '\'')
-			print('    restore_cmd: \'' + str(meta['restore_cmd']) + '\'')
 
 		return meta
 

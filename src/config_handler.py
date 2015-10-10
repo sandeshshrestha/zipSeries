@@ -68,8 +68,8 @@ def parse_config_file(config, l_config, file, f_config):
 		if line == '' or line[0] == '#':
 			continue
 
-		if config['verbose']:
-			print('zipSeries: processing:' + line)
+		if config['trace']:
+			print('zipSeries: processing: ' + line)
 
 		err_msg = None
 

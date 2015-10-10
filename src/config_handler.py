@@ -83,8 +83,6 @@ def parse_config_file(config, l_config, file, f_config):
 				print('zipSeries: key \'' + key + '\' is allready set to \'' + str(l_config[key]) + '\'')
 				continue
 
-			print(line)
-
 			# Release 
 			if key == 'release':
 				if value in RELEASE_LIST:

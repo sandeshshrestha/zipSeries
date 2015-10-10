@@ -66,11 +66,14 @@ zipSeries --help
 Install
 =======
 
+.. image:: ./zipSeries-install.gif
+
 .. code-block:: bash
 
-	git clone ssh://github.com/ginkoms/zipSeries
-	cd zipSeries
-	bash install.sh
+	$ cd ~
+	$ git clone ssh://github.com/ginkoms/zipSeries .zipSeries
+	$ cd .zipSeries
+	$ bash install.sh
 
 See install help:
 

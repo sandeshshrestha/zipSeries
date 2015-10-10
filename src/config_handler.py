@@ -90,7 +90,7 @@ def parse_config_file(config, l_config, file, f_config):
 				else:
 					err_msg = 'release not supported: \'' + value + '\', supported releases: \'' + (', '.join(RELEASE_LIST)) + '\''
 
-			# TODO Support a space seperated list of object types
+			# Support a space seperated list of object types
 			elif key == 'obj-type':
 				if any(x in OBJECT_TYPE_LIST for x in value.split(' ')):
 					l_config[key] = value.split(' ')

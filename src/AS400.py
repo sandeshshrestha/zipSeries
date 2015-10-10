@@ -174,16 +174,8 @@ class AS400:
 
 				# TODO display job log
 				sys.exit(1)
-				ftp.voidcmd('RCMD ' + self.cl('dspjoblog'))
-				ftp.voidcmd('RCMD ' + self.cl('crtpf'))
-				ftp.voidcmd('RCMD ' + self.cl('cpysplf'))
-				ftp.voidcmd('RCMD ' + self.cl('cpytostmf', {
-					'frommbr': '/QSYS.LIB/QTEMP.LIB/ZS_ERR.FILE/ZS_ERR.MBR',
-					'tostmf': 'zs_' + str(uuid.uuid1()),
-					'stmfccsid': '1208'
-				}, quote=['frommbr', 'tostmf']))
+				self.__dspjoblog(ftp);
 				ftp.quit()
-
 				sys.exit(1)
 
 		except Exception as e:
@@ -320,14 +312,7 @@ class AS400:
 
 				# TODO display job log
 				sys.exit(1)
-				ftp.voidcmd('RCMD ' + self.cl('dspjoblog'))
-				ftp.voidcmd('RCMD ' + self.cl('crtpf'))
-				ftp.voidcmd('RCMD ' + self.cl('cpysplf'))
-				ftp.voidcmd('RCMD ' + self.cl('cpytostmf', {
-					'frommbr': '/QSYS.LIB/QTEMP.LIB/ZS_ERR.FILE/ZS_ERR.MBR',
-					'tostmf': 'zs_' + str(uuid.uuid1()),
-					'stmfccsid': '1208'
-				}, quote=['frommbr', 'tostmf']))
+				self.__dspjoblog(ftp)	
 				ftp.quit()
 				sys.exit(1)
 

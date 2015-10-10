@@ -81,7 +81,7 @@ See install help:
 	Install zipSeries CLI on your machine
 
 	      --nosymlink      dont create a symlink in the folder ~/bin
-	      --norc           dont add code to ~/.bashrc and ~/.zshr'
+	      --norc           dont add code to ~/.bashrc and ~/.zshrc
 	      --nocfg          dont create the folder /etc/zipSeries
 	      --help           display this help and exit
 

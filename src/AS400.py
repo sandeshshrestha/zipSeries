@@ -187,6 +187,7 @@ class AS400:
 
 		except Exception as e:
 			sys.stderr.write('zipSeries: error: ' + str(e) + '\n')
+			sys.exit(1)
 
 		try:
 			ftp.quit()
@@ -210,7 +211,7 @@ class AS400:
 			'saved_by': create_ascii(PGM_DESCRIPTION, 256),
 			'save_timestamp': create_ascii(create_timestamp(), 32),
 			'release': create_ascii(self.target['release'], 11),
-			'restore_cmd': create_ascii(self.target['restore_cmd'], 256), # not supported yet
+			'restore_cmd': create_ascii(self.target['restore_cmd'] or '', 256),
 
 			# the below is only used by zipSeries C++ dont use:
 			'_svr': create_ascii('', 256),
@@ -327,11 +328,11 @@ class AS400:
 					'stmfccsid': '1208'
 				}, quote=['frommbr', 'tostmf']))
 				ftp.quit()
-
 				sys.exit(1)
 
 		except Exception as e:
 			sys.stderr.write('zipSeries: error: ' + str(e) + '\n')
+			sys.exit(1)
 
 		try:
 			ftp.quit()

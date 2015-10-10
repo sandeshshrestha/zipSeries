@@ -93,24 +93,20 @@ fi
 if [ "$nocfg" = false ]; then
 	echo $pgm: creating if not exists /etc/zipSeries
 
-	# Windows doesnt have sudo
-	if is_windows; then
-		mkdir -p /etc/zipSeries
-	else
-		sudo mkdir -p /etc/zipSeries
-	fi
+	mkdir -p /etc/zipSeries
 
 	if [[ "$?" != "0" ]]; then
 		>&2 echo $pgm: error: cannot create /etc/zipSeries
 		exit 1
 	fi
 
-	echo Change mode to 700 for /etc/zipSeries
-	# Windows doesnt have sudo
-	if is_windows; then
-		chmod 700 /etc/zipSeries
-	else
-		sudo chmod 700 /etc/zipSeries
+	echo $pgm: change mode to 700 for /etc/zipSeries
+	chmod 700 /etc/zipSeries
+	
+	if [[ ! -f "(/etc/zipSeries/zipSeries.conf" ]]; then
+		echo $pgm: creating example file zipSeries.conf in /etc/zipSeries
+		cat "$bash_dirname/examples/zipSeries.conf" > /etc/zipSeries/zipSeries.conf
+		chmod 600 /etc/zipSeries/zipSeries.conf
 	fi
 fi
 

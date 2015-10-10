@@ -40,30 +40,40 @@ if [ "$nosymlink" = false ]; then
 
 	# Remove old zipSeries
 	[[ -f ~/bin/zipSeries ]] && echo $pgm: removing ~/bin/zipSeries && rm ~/bin/zipSeries
-	
+
 	link="$(cd ~/bin;pwd)/zipSeries"
 	target="$bash_dirname/zipSeries.py"
+	link2="$(cd ~/bin;pwd)/zipSeriesPrompt"
+	target2="$bash_dirname/zipSeriesPrompt.pl"
 
 	# Remove current link so we can handle updates
 	rm $link 2> /dev/null
+	rm $link2 2> /dev/null
 
 	# Support zipSeries in git bash
 	# Source: https://stackoverflow.com/questions/18641864/git-bash-shell-fails-to-create-symbolic-links
 	if is_windows; then
 		echo $pgm: creating wrapper command for $link
-
 		echo "#!/usr/bin/env bash" > $link
 		echo "python \"$target\" \$@" >> $link
+		
+		echo $pgm: creating wrapper command for $link2
+		echo "#!/usr/bin/env bash" > $link2
+		echo "perl \"$target2\" \$@" >> $link2
 	else
 		echo $pgm: making symlink to $link for $target
 		ln -s "$target" "$link"
+		
+		echo $pgm: making symlink to $link2 for $target2
+		ln -s "$target2" "$link2"
 	fi
 
 	if [[ "$?" != "0" ]]; then
 		>&2 echo $pgm: error: cannot create symlink to $link for $target
 		exit 1
 	fi
-	chmod +x ~/bin/zipSeries
+	chmod +x $target
+	chmod +x $target2
 fi
 
 if [ "$norc" = false ]; then

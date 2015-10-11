@@ -34,8 +34,12 @@ def main():
 		print('zipSeries: gracefully shutting zipSeries down. Use Ctrl + C in the future')
 		sys.exit(0)
 	
-	signal.signal(signal.SIGINT, lambda signum, frame: sys.exit(0))
-	signal.signal(signal.SIGTSTP, gracefull_exit)
+	# Windows doesnt have the SIGTSTP signal
+	try: 
+		signal.signal(signal.SIGINT, lambda signum, frame: sys.exit(0))
+		signal.signal(signal.SIGTSTP, gracefull_exit)
+	except Exception as e:
+		pass
 	
 	parser = argparse.ArgumentParser(
 		usage='usage: zipSeries [--version] | [--help] | [OPTION]...',

@@ -174,7 +174,7 @@ def main():
 	config = {
 		# when verbose is True zipSeries will print information about the programs workfow
 		'trace': args.trace,
-		'verbose': args.verbose,
+		'verbose': args.verbose or args.trace,
 		'source': {
 			'svr': args.s_svr,
 			'usr': args.s_usr,

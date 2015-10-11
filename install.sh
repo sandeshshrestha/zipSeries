@@ -72,8 +72,8 @@ if [ "$nosymlink" = false ]; then
 		>&2 echo $pgm: error: cannot create symlink to $link for $target
 		exit 1
 	fi
-	chmod +x $target
-	chmod +x $target2
+	chmod +x $link
+	chmod +x $link2
 fi
 
 if [ "$norc" = false ]; then

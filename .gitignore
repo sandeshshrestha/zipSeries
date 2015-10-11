@@ -8,3 +8,5 @@ Thumbs.db
 *.pyc
 # builded main file
 /zipSeries
+# Windows tmp files:
+*.*~

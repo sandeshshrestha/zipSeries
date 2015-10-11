@@ -14,12 +14,15 @@ use warnings;
 use Cwd 'abs_path';
 use File::Basename;
 
+use constant VERSION => "1.0.0";
+
 my $root_dir = dirname(abs_path($0));
 my $zipSeries = "python $root_dir/zipSeries.py";
 
 my %possible_zs_args = get_possible_zs_args();
 my %zs_args = parse_argv();
 
+# Prompt the remaining args that are not allready defined via CLI:
 foreach (keys %possible_zs_args) {
 	
 	my $opt = $_;
@@ -39,7 +42,6 @@ foreach (keys %possible_zs_args) {
 }
 
 # Run zipSeries command:
-
 my $cmd = "$zipSeries";
 $cmd .= " \\\n    $_ \"$zs_args{$_}\"" foreach (keys %zs_args);
 
@@ -50,17 +52,16 @@ print "\n";
 system("$cmd");
 
 # Subrutines:
-
 sub get_possible_zs_args {
 
 	my %args;
-
 	open my $fh_help, "$zipSeries --help |" or die $!;
 	while (<$fh_help>) {
 		if (m/^\s*options:\s*$/) {
 			last;
 		}
 		if (m/^\s{0,10}-/) {
+			# Capture: -c, (--command)      (description with spaces)
 			my ($opt, $desc) = $_ =~ /(--.*?)\s+(.*?)$/;	
 			$args{$opt} = $desc;
 		}
@@ -85,7 +86,7 @@ sub print_help {
 }
 
 sub print_version {
-	print "zipSeriesPrompt version=1.0.0\n";
+	print "zipSeriesPrompt version=" . VERSION . "\n";
 	exit 0;
 }
 

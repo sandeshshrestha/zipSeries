@@ -6,8 +6,6 @@
 #   You can specify all of the same arguments as you can for zipSeries 
 #
 
-
-use 5;
 use strict;
 use warnings;
 

@@ -55,9 +55,8 @@ sub get_possible_zs_args {
 	my %args;
 	open my $fh_help, "$zipSeries --help |" or die $!;
 	while (<$fh_help>) {
-		if (m/^\s*options:\s*$/) {
-			last;
-		}
+		last if (m/^\s*options:\s*$/);
+		
 		if (m/^\s{0,10}-/) {
 			# Capture: -c, (--command)      (description with spaces)
 			my ($opt, $desc) = $_ =~ /(--.*?)\s+(.*?)$/;	

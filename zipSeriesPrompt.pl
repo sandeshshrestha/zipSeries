@@ -104,4 +104,6 @@ sub parse_argv {
 			$args{$opt} = $_; 
 		}
 	}
+
+	return %args;
 }

@@ -1,5 +1,12 @@
 #!/usr/bin/env perl
 
+# zipSeriesPrompt
+# 
+# This is an interactive prompt for zipSeries. 
+#   You can specify all of the same arguments as you can for zipSeries 
+#
+
+
 use 5;
 use strict;
 use warnings;
@@ -10,61 +17,93 @@ use File::Basename;
 my $root_dir = dirname(abs_path($0));
 my $zipSeries = "python $root_dir/zipSeries.py";
 
-my %args;
+my %possible_zs_args = get_possible_zs_args();
+my %zs_args = parse_argv();
 
-my $opt;
-foreach (@ARGV) {
-	if (m/--help/) {
-		print "usage zipSeriesPrompt [--version] | [--help] | [zipSeries OPTION]...\n";
-		print "\n";
-		print "This is an interactive prompt for zipSeries. You can specify all of the same arguments as you can for zipSeries\n";
-		print "\n";
-		print "  --version      output version information and exit\n";
-		print "    --help       show this help message and exit\n";
-		exit 0;
-	}
-	elsif (m/--version/) {
-		print "zipSeriesPrompt version=1.0.0\n";
-		exit 0;
-	}
-	elsif (m/^-/) {
-		$opt = $_;
-	}
-	else {
-		$args{$opt} = $_; 
-	}
-}
-
-open my $fh_help, "$zipSeries --help |" or die $!;
-while (<$fh_help>) {
-	if (m/^\s*options:\s*$/) {
-		last;
-	}
-	if (m/^\s{0,10}-/) {
+foreach (keys %possible_zs_args) {
 	
-		my ($opt, $desc) = $_ =~ /(--.*?)\s+(.*?)$/;	
+	my $opt = $_;
+	my $desc = $possible_zs_args{$opt};
 
-		if (not exists $args{$opt}) {
-			print "Please enter $opt -- $desc: ";
+	if (not exists $zs_args{$opt}) {
+		print "Please enter $opt -- $desc: ";
 
-			my $value = <STDIN>;
+		my $value = <STDIN>;
+		$value =~ s/\s+$//;
+
+		if ($value ne "") {
 			$value =~ s/\s+$//;
-
-			if ($value ne "") {
-				$value =~ s/\s+$//;
-				$args{$opt} = $value;
-			}
+			$zs_args{$opt} = $value;
 		}
 	}
 }
 
-close $fh_help;
+# Run zipSeries command:
 
 my $cmd = "$zipSeries";
-$cmd .= " \\\n    $_ \"$args{$_}\"" foreach (keys % args);
+$cmd .= " \\\n    $_ \"$zs_args{$_}\"" foreach (keys %zs_args);
 
 print "The followingg command will be run:\n";
 print "$cmd ";
 print "\n";
 
 system("$cmd");
+
+# Subrutines:
+
+sub get_possible_zs_args {
+
+	my %args;
+
+	open my $fh_help, "$zipSeries --help |" or die $!;
+	while (<$fh_help>) {
+		if (m/^\s*options:\s*$/) {
+			last;
+		}
+		if (m/^\s{0,10}-/) {
+			my ($opt, $desc) = $_ =~ /(--.*?)\s+(.*?)$/;	
+			$args{$opt} = $desc;
+		}
+	}
+	close $fh_help;
+
+	return %args;
+}
+
+sub print_help {
+	print "usage zipSeriesPrompt [--version] | [--help] | [zipSeries OPTION]...\n";
+	print "\n";
+	print "This is an interactive prompt for zipSeries. You can specify all of the same arguments as you can for zipSeries\n";
+	print "\n";
+	print "zipSeries options:\n";
+	print sprintf "  %-25s %-s\n", $_, $possible_zs_args{$_} foreach (keys %possible_zs_args);
+	print "\n";
+	print "options:\n";
+	print "  --version                 output version information and exit\n";
+	print "  --help                    show this help message and exit\n";
+	exit 0;
+}
+
+sub print_version {
+	print "zipSeriesPrompt version=1.0.0\n";
+	exit 0;
+}
+
+sub parse_argv {
+	my %args;
+	my $opt;
+	foreach (@ARGV) {
+		if (m/--help/) {
+			print_help();
+		}
+		elsif (m/--version/) {
+			print_version();
+		}
+		elsif (m/^-/) {
+			$opt = $_;
+		}
+		else {
+			$args{$opt} = $_; 
+		}
+	}
+}

@@ -14,7 +14,7 @@ pgm=$0
 while (($#)); do
 	case $1 in
 		--help )
-			echo 'usage: '$pgm' [OPTION]...'
+			echo 'usage: '$pgm' [--help] | [OPTION]...'
 			echo 'Install zipSeries CLI on your machine'
 			echo ''
 			echo '      --nosymlink      dont create a symlink in the folder ~/bin'

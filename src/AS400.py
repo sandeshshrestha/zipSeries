@@ -126,7 +126,7 @@ class AS400:
 
 	def __create_save_file(self, root_dir):
 		as_ifs_save_file = 'zipSeries-' + str(uuid.uuid1()) + '.savf'
-		tmp_file = root_dir + '/' + 'file.tmp'
+		tmp_file = os.path.join(root_dir, 'filetmp')
 
 		try:
 			if self.config['verbose']:
@@ -244,19 +244,42 @@ class AS400:
 		os.mkdir(root_dir)
 
 		tmp_file = self.__create_save_file(root_dir)
-		ascii = self.__create_ascii(root_dir + '/' + tmp_file)
+		ascii = self.__create_ascii(os.path.join(root_dir, tmp_file))
 
-		with open(root_dir + '/' + INFO_FILE, 'wb') as f:
+		with open(os.path.join(root_dir, INFO_FILE), 'wb') as f:
 			f.write(binascii.unhexlify(ascii))
 
+		if self.config['verbose']:
+			print('zipSeries: creating zip file')
 		zip = zipfile.ZipFile(self.save_file, 'w')
+
+		if self.config['trace']:
+			print('zipSeries: zip: adding file ' + tmp_file)
 		zip.write(tmp_file, os.path.basename(tmp_file))
-		zip.write(root_dir + '/' + INFO_FILE, INFO_FILE)
+
+		if self.config['trace']:
+			print('zipSeries: zip: adding file ' + os.path.join(root_dir, INFO_FILE))
+		zip.write(os.path.join(root_dir, INFO_FILE), INFO_FILE)
+
 		zip.close()
 
+		if self.config['verbose']:
+			print('zipSeries: cleaning up...')
+
+		if self.config['trace']:
+			print('zipSeries: removing ' + tmp_file)
 		os.remove(tmp_file)
-		os.remove(root_dir + '/' + INFO_FILE)
+
+		if self.config['trace']:
+			print('zipSeries: removing ' + os.path.join(root_dir, INFO_FILE))
+		os.remove(os.path.join(root_dir, INFO_FILE))
+
+		if self.config['trace']:
+			print('zipSeries: removing ' + root_dir)
 		os.rmdir(root_dir)
+
+		if self.config['verbose']:
+			print('zipSeries: done')
 
 	def restore(self, save_file=None):
 		# save_file should be restored on the AS/400
@@ -270,7 +293,7 @@ class AS400:
 		if self.config['verbose']:
 			print('zipSeries: unzipping \'' + save_file + '\' to \'' + root_dir + '\'')
 
-		meta = self.__parse_ascii(list(read_file_ascii(root_dir + '/' + INFO_FILE)))
+		meta = self.__parse_ascii(list(read_file_ascii(os.path.join(root_dir,  INFO_FILE))))
 
 		meta['restore_file'] = glob.glob(root_dir + '/*.tmp')[0]
 

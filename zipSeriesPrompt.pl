@@ -21,7 +21,7 @@ my %possible_zs_args = get_possible_zs_args();
 my %zs_args = parse_argv();
 
 # Prompt the remaining args that are not allready defined via CLI:
-foreach (keys %possible_zs_args) {
+foreach (sort { $a cmp $b } keys %possible_zs_args) {
 	
 	my $opt = $_;
 	my $desc = $possible_zs_args{$opt};
@@ -41,7 +41,7 @@ foreach (keys %possible_zs_args) {
 
 # Run zipSeries command:
 my $cmd = "$zipSeries";
-$cmd .= " \\\n    $_ \"$zs_args{$_}\"" foreach (keys %zs_args);
+$cmd .= " \\\n    $_ \"$zs_args{$_}\"" foreach (sort { $a cmp $b } keys %zs_args);
 
 print "The followingg command will be run:\n";
 print "$cmd ";
@@ -74,7 +74,7 @@ sub print_help {
 	print "This is an interactive prompt for zipSeries. You can specify all of the same arguments as you can for zipSeries\n";
 	print "\n";
 	print "zipSeries options:\n";
-	print sprintf "  %-25s %-s\n", $_, $possible_zs_args{$_} foreach (keys %possible_zs_args);
+	print sprintf "  %-25s %-s\n", $_, $possible_zs_args{$_} foreach (sort { $a cmp $b } keys %possible_zs_args);
 	print "\n";
 	print "options:\n";
 	print "  --version                 output version information and exit\n";

@@ -144,14 +144,21 @@ class AS400:
 
 			try:
 				ftp.voidcmd('site namefmt 1')
+
+				if self.config['verbose']:
+					print('zipSeries: creating savefile')
 				ftp.voidcmd('RCMD ' + self.cl('crtsavf'))
 
 				if self.source['obj'] == None:
+					if self.config['verbose']:
+						print('zipSeries: saving library to savefile')
 					ftp.voidcmd('RCMD ' + self.cl('savlib', {
 						'lib': self.source['lib'],
 						'release': self.target['release']
 					}))
 				else:
+					if self.config['verbose']:
+						print('zipSeries: saving object(s) to savefile')
 					ftp.voidcmd('RCMD ' + self.cl('savobj', {
 						'obj': ' '.join(self.source['obj']),
 						'objtype': ' '.join(self.source['obj-type']),
@@ -159,11 +166,17 @@ class AS400:
 						'release': self.target['release']
 					}))
 
+				if self.config['verbose']:
+					print('zipSeries: copying save file to streamfile')
+
 				ftp.voidcmd('RCMD ' + self.cl('cpytostmf', {
 					'frommbr': '/QSYS.LIB/QTEMP.LIB/ZS.FILE',
 					'tostmf': '/tmp/' + as_ifs_save_file,
 					'stmfccsid': '*STMF'
 				}, quote=['frommbr', 'tostmf']))
+
+				if self.config['verbose']:
+					print('zipSeries: downloading streamfile')
 
 				with open(tmp_file, 'wb') as f:
 					ftp.retrbinary('RETR /tmp/' + as_ifs_save_file, f.write)
@@ -303,7 +316,7 @@ class AS400:
 				# Run restore command if specified
 				if meta['restore_cmd'] != '':
 					if self.config['verbose']:
-						print('zipSeries: running restore command: ' + meta['restore_cmd'])
+						print('zipSeries: running iSeries (AS/400) restore command: ' + meta['restore_cmd'])
 						ftp.voidcmd('RCMD ' + meta['restore_cmd'])
 
 			except Exception as e:

@@ -190,8 +190,8 @@ def main():
 	config = {
 		# when verbose is True zipSeries will print information about the programs workfow
 		'no-prompt': args.no_prompt,
-		'trace': args.trace,
-		'verbose': args.verbose or args.trace,
+		'trace': args.no_prompt == False and args.trace,
+		'verbose': args.no_prompt == False and (args.verbose or args.trace),
 		'silent': args.silent,
 		'source': {
 			'svr': args.s_svr,

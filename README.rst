@@ -77,6 +77,8 @@ Install
 	$ git clone ssh://github.com/ginkoms/zipSeries .zipSeries
 	$ cd .zipSeries
 	$ bash install.sh
+	$ [[ -f ~/.bashrc ]] && source ~/.bashrc 
+	$ [[ -f ~/.zshrc ]] && source ~/.zshrc
 
 See install help:
 

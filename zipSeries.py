@@ -141,6 +141,12 @@ def main():
 	)
 
 	# General
+	general_group.add_argument('--no-prompt',
+		dest='no_prompt',
+		action='store_true',
+		default=False,
+		help='do not prompt on empty password and empty object'
+	)
 	general_group.add_argument('-v', '--verbose',
 		dest='verbose',
 		action='store_true',
@@ -177,6 +183,7 @@ def main():
 
 	config = {
 		# when verbose is True zipSeries will print information about the programs workfow
+		'no-prompt': args.no_prompt,
 		'trace': args.trace,
 		'verbose': args.verbose or args.trace,
 		'source': {
@@ -210,13 +217,13 @@ def main():
 
 	if config['target']['release'] == None:
 		config['target']['release'] = "*CURRENT"
-	
+
 	check_config(config)
 
 	# if no --target-save-file is specified and no --source-obj is specified
 	#   there should be prompted for an object, simply because thats what you
 	#   usually wants. Make sure that you can still export a full library
-	if config['target']['save-file'] == None and config['source']['obj'] == None:
+	if config['no-prompt'] == False and config['target']['save-file'] == None and config['source']['obj'] == None:
 		obj = input('Enter object to save (*NONE = full library, space for multiply objects): ')
 		if obj != '' and obj != '*NONE':
 			config['source']['obj'] = obj.split(' ')
@@ -224,13 +231,13 @@ def main():
 	as400 = AS400(config)
 
 	if config['target']['save-file'] == None:
-		if config['source']['pwd'] == None:
+		if config['source']['pwd'] == None and config['no-prompt'] == False:
 			config['source']['pwd'] = getpass.getpass('Enter source user password: ')
 
 		as400.save()
 
 	if config['source']['save-file'] == None:
-		if config['target']['pwd'] == None:
+		if config['target']['pwd'] == None and config['no-prompt'] == False:
 			config['target']['pwd'] = getpass.getpass('Enter target user password: ')
 
 		as400.restore(config['target']['save-file'])

@@ -58,6 +58,7 @@ zipSeries --help
 	                         on target machine
 
 	options:
+	  --no-prompt            do not prompt on empty password and empty object
 	  -v, --verbose          be more verbose/talkative during the operation
 	  --trace                trace commands and other information
 	  --version              output version information and exit

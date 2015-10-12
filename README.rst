@@ -85,7 +85,7 @@ See install help:
 .. code-block:: bash
 
 	$ bash install.sh --help
-	usage: install.sh [OPTION]...
+	usage: install.sh [--help] | [OPTION]...
 	Install zipSeries CLI on your machine
 
 	      --nosymlink      dont create a symlink in the folder ~/bin

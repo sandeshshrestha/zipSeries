@@ -62,6 +62,7 @@ zipSeries --help
 	  -v, --verbose          be more verbose/talkative during the operation
 	  --trace                trace commands and other information
 	  --version              output version information and exit
+	  --silent               silent mode. Don't output warnings
 	  --help                 show this help message and exit
 
 

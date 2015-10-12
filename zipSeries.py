@@ -159,6 +159,12 @@ def main():
 		default=False,
 		help='trace commands and other information'
 	)
+	general_group.add_argument('--silent',
+		dest='silent',
+		action='store_true',
+		default=False,
+		help='silent mode. Don\'t output warnings'
+	)
 	general_group.add_argument('--version',
 		dest='version',
 		action='store_true',
@@ -186,6 +192,7 @@ def main():
 		'no-prompt': args.no_prompt,
 		'trace': args.trace,
 		'verbose': args.verbose or args.trace,
+		'silent': args.silent,
 		'source': {
 			'svr': args.s_svr,
 			'usr': args.s_usr,

@@ -78,12 +78,13 @@ def parse_config_file(config, l_config, file, f_config):
 			split_index = line.index(' ')
 			key = line[0:split_index]
 			value = line[split_index+1:]
-			
+
 			if key in l_config and l_config[key] != None:
-				print('zipSeries: key \'' + key + '\' is allready set to \'' + str(l_config[key]) + '\'')
+				if not config['silent']:
+					print('zipSeries: key \'' + key + '\' is allready set to \'' + str(l_config[key]) + '\'')
 				continue
 
-			# Release 
+			# Release
 			if key == 'release':
 				if value in RELEASE_LIST:
 					l_config[key] = value

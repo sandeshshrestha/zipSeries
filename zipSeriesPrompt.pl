@@ -12,42 +12,17 @@ use warnings;
 use Cwd 'abs_path';
 use File::Basename;
 
-use constant VERSION => "1.0.0";
+use constant VERSION => "1.1.0";
 
-my $root_dir = dirname(abs_path($0));
-my $zipSeries = "python $root_dir/zipSeries.py";
+my $root_dir;
+my $zipSeries;
+my $zipSeriesPrompt;
+my %possible_zs_args;
+my %zs_args;
 
-my %possible_zs_args = get_possible_zs_args();
-my %zs_args = parse_argv();
+my $f_factory;
 
-# Prompt the remaining args that are not allready defined via CLI:
-foreach (sort { $a cmp $b } keys %possible_zs_args) {
-	
-	my $opt = $_;
-	my $desc = $possible_zs_args{$opt};
-
-	if (not exists $zs_args{$opt}) {
-		print "Please enter $opt -- $desc: ";
-
-		my $value = <STDIN>;
-		$value =~ s/\s+$//;
-
-		if ($value ne "") {
-			$value =~ s/\s+$//;
-			$zs_args{$opt} = $value;
-		}
-	}
-}
-
-# Run zipSeries command:
-my $cmd = "$zipSeries";
-$cmd .= " \\\n    $_ \"$zs_args{$_}\"" foreach (sort { $a cmp $b } keys %zs_args);
-
-print "The followingg command will be run:\n";
-print "$cmd ";
-print "\n";
-
-system("$cmd");
+main();
 
 # Subrutines:
 sub get_possible_zs_args {
@@ -77,6 +52,7 @@ sub print_help {
 	print sprintf "  %-25s %-s\n", $_, $possible_zs_args{$_} foreach (sort { $a cmp $b } keys %possible_zs_args);
 	print "\n";
 	print "options:\n";
+	print "  --factory                 output zipSeriesPrompt with prefilled options\n";
 	print "  --version                 output version information and exit\n";
 	print "  --help                    show this help message and exit\n";
 	exit 0;
@@ -97,6 +73,9 @@ sub parse_argv {
 		elsif (m/--version/) {
 			print_version();
 		}
+		elsif (m/--factory/) {
+			$f_factory = 1;
+		}
 		elsif (m/^-/) {
 			$opt = $_;
 		}
@@ -107,3 +86,52 @@ sub parse_argv {
 
 	return %args;
 }
+
+sub main {
+	$root_dir = dirname(abs_path($0));
+	$zipSeries = "python $root_dir/zipSeries.py";
+	$zipSeriesPrompt = "perl $root_dir/zipSeriesPrompt.pl";
+
+	%possible_zs_args = get_possible_zs_args();
+	%zs_args = parse_argv();
+
+	# Prompt the remaining args that are not allready defined via CLI:
+	foreach (sort { $a cmp $b } keys %possible_zs_args) {
+		
+		my $opt = $_;
+		my $desc = $possible_zs_args{$opt};
+
+		if (not exists $zs_args{$opt}) {
+			print "Please enter $opt -- $desc: ";
+
+			my $value = <STDIN>;
+			$value =~ s/\s+$//;
+
+			if ($value ne "") {
+				$value =~ s/\s+$//;
+				$zs_args{$opt} = $value;
+			}
+		}
+	}
+
+	# Run zipSeries command:
+	my $cmd;
+	$cmd .= " \\\n    $_ \"$zs_args{$_}\"" foreach (sort { $a cmp $b } keys %zs_args);
+
+	if (not $f_factory) {
+		$cmd = "$zipSeries$cmd";
+		print "The followingg command will be run:\n";
+		print "$cmd\n";
+		print "\n";
+		print "Note: You can copy any of the above options and call zipSeriesPrompt with it\n";
+		print "Press [ENTER] to continue: (Ctrl+C to terminate)\n";
+		<STDIN>;
+		system("$cmd");
+	}
+	else {
+		$cmd = "$zipSeriesPrompt$cmd";
+		print "$cmd\n";
+	}
+}
+
+

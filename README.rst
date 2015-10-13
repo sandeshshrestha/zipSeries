@@ -20,7 +20,7 @@ Copy libraries / objects from one iSeries (AS/400) to another running the same (
 How is zipSeries CLI licensed?
 ------------------------------
 
-MIT license. See the `LICENSE` fil in the distribution.
+MIT license. See the `LICENSE file <LICENSE>`_ in the distribution.
 
 zipSeries --help
 ----------------

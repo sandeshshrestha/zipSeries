@@ -69,8 +69,6 @@ zipSeries --help
 Install
 =======
 
-.. image:: ./zipSeries-install.gif
-
 .. code-block:: bash
 
 	$ cd ~

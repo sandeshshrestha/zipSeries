@@ -94,13 +94,6 @@ See install help:
 	      --noroot         install without running as root
 	      --help           display this help and exit
 
-
-Make sure that ~/bin is in your `$PATH` variable:
-
-.. code-block:: bash
-
-	export PATH="~/bin:$PATH"
-
 Usage
 =====
 

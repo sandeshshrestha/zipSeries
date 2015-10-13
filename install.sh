@@ -6,7 +6,7 @@ cd $bash_dirname;
 nosymlink=false
 norc=false
 nocfg=false
-
+noroot=false
 
 is_windows() { [[ -n "$WINDIR" ]]; }
 
@@ -20,12 +20,14 @@ while (($#)); do
 			echo '      --nosymlink      dont create a symlink in the folder ~/bin'
 			echo '      --norc           dont add code to ~/.bashrc and ~/.zshrc'
 			echo '      --nocfg          dont create the folder /etc/zipSeries'
+			echo '      --noroot         install without running as root'
 			echo '      --help           display this help and exit'
 			exit 0
 			;;
 		--nosymlink ) nosymlink=true;;
 		--norc ) norc=true;;
 		--nocfg ) nocfg=true;;
+		--noroot ) noroot=true;;
 		* ) 
 			>&2 echo "$pgm: option '$1' not supported"
 			exit 1
@@ -33,6 +35,12 @@ while (($#)); do
 	esac
 	shift
 done
+
+# Check for root user
+if [[ "$EUID" -ne 0 && "$noroot" = false ]]; then
+	>&2 echo "$pgm: need to run as root to install properly. Use --noroot to allow installing without root"
+	exit 1;
+fi
 
 if [ "$nosymlink" = false ]; then
 	echo $pgm: creating if not exists ~/bin

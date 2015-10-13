@@ -15,4 +15,4 @@
 ## Version 1.4
 - [ ] Support pre restore command
 - [ ] Support multiply libraries
-- [ ] Add option `--backup-save-file` that will take a backup of the current objects / libraries before restoring.
+- [ ] Add option `--backup-save-file` that will take a backup of the current objects / libraries before restoring

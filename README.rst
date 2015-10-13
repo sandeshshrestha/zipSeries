@@ -91,6 +91,7 @@ See install help:
 	      --nosymlink      dont create a symlink in the folder ~/bin
 	      --norc           dont add code to ~/.bashrc and ~/.zshrc
 	      --nocfg          dont create the folder /etc/zipSeries
+	      --noroot         install without running as root
 	      --help           display this help and exit
 
 

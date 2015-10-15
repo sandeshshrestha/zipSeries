@@ -71,10 +71,17 @@ def parse_config_file(config, l_config, file, f_config):
 		if config['trace']:
 			print('zipSeries: processing: ' + line)
 
-		err_msg = None
+		error = False
 
-		# If the config line cannot be parsed an error should be written
-		if ' ' in line:
+		if not ' ' in line:
+			key = line
+			# Booleans (will set to true if defined
+			#   dont support silent in config files that it would be a headache to figure out why nothing is printed
+			if key in ['job-log', 'no-prompt', 'verbose', 'trace']:
+				l_config[key] = True
+			else:
+				error=True
+		else:
 			split_index = line.index(' ')
 			key = line[0:split_index]
 			value = line[split_index+1:]
@@ -91,22 +98,20 @@ def parse_config_file(config, l_config, file, f_config):
 				else:
 					err_msg = 'release not supported: \'' + value + '\', supported releases: \'' + (', '.join(RELEASE_LIST)) + '\''
 
-			# Support a space seperated list of object types
+			# Object types: support a space seperated list of object types
 			elif key == 'obj-type':
 				if any(x in OBJECT_TYPE_LIST for x in value.split(' ')):
 					l_config[key] = value.split(' ')
 				else:
 					err_msg = 'object type not supported: \'' + value + '\', supported types: \'' + (', '.join(OBJECT_TYPE_LIST)) + '\''
-			
 			# Standard values (cannot be validated)
-			elif key in ['svr', 'usr', 'pwd', 'lib', 'obj']:
+			elif key in ['svr', 'usr', 'pwd', 'lib', 'obj', 'job-log-file']:
 				l_config[key] = value
 			else:
-				err_msg = 'key not recornized: \'' + key + '\' in line \'' + line + '\''
-
-		if err_msg != None:
+				error = True
+		
+		if error:
+			err_msg = 'key not recornized: \'' + key + '\' in line \'' + line + '\''
 			sys.stderr.write('zipSeries: cannot parse \'' + file + '\':\n')
 			sys.stderr.write('Line (' + str(i+1) + '): ' + err_msg + '\n')
 			sys.exit(1)
-
-

@@ -34,36 +34,41 @@ zipSeries --help
 	(or lower) release of OS/400 as source.
 
 	source options:
-	  -s , --source-svr      set server for the source
-	  -u , --source-usr      set user profile for the source
-	  -p , --source-pwd      set user password for the source
-	  -l , --source-lib      set library for the source
-	  -o , --source-obj      set object for the source - leave blank if whole
-	                         library is saved
-	  --source-obj-type      set object type for the source
-	  -c , --source-config   read source config from file
-	  --source-save-file     save OS/400 savfile locally all --target-* options
-	                         will ignored
+	  -s , --source-svr       set server for the source
+	  -u , --source-usr       set user profile for the source
+	  -p , --source-pwd       set user password for the source
+	  -l , --source-lib       set library for the source
+	  -o , --source-obj       set object for the source - leave blank if whole
+	                          library is saved
+	  --source-obj-type       set object type for the source
+	  -c , --source-config    read source config from file
+	  --source-save-file      save OS/400 savfile locally all --target-* options
+	                          will ignored
+	  --source-job-log-file   save source servers job log to a file
 
 	target options:
-	  --target-release       set OS/400 release for the target
-	  -S , --target-svr      set server for the target
-	  -U , --target-usr      set user profile for the target
-	  -P , --target-pwd      set user password for the target
-	  -L , --target-lib      set library for the target
-	  -C , --target-config   read target config from file
-	  --target-save-file     restore from OS/400 savfile stored locally all
-	                         --source-* options will ignored
-	  --target-restore-cmd   command to run when object(s) / library is restored
-	                         on target machine
+	  --target-release        set OS/400 release for the target
+	  -S , --target-svr       set server for the target
+	  -U , --target-usr       set user profile for the target
+	  -P , --target-pwd       set user password for the target
+	  -L , --target-lib       set library for the target
+	  -C , --target-config    read target config from file
+	  --target-save-file      restore from OS/400 savfile stored locally all
+	                          --source-* options will ignored
+	  --target-restore-cmd    command to run when object(s) / library is restored
+	                          on target machine
+	  --target-job-log-file   save target servers job log to a file
 
 	options:
-	  --no-prompt            do not prompt on empty password and empty object
-	  -v, --verbose          be more verbose/talkative during the operation
-	  --trace                trace commands and other information
-	  --version              output version information and exit
-	  --silent               silent mode. Don't output warnings
-	  --help                 show this help message and exit
+	  --source-job-log        display source servers job log
+	  --target-job-log        display target servers job log
+	  --no-prompt             do not prompt on empty password and empty object
+	  -v, --verbose           be more verbose/talkative during the operation
+	  --trace                 trace commands and other information
+	  --silent                silent mode. Don't output warnings
+	  --version               output version information and exit
+	  --help                  show this help message and exit
+
 
 
 Install
@@ -75,7 +80,7 @@ Install
 	$ git clone ssh://github.com/ginkoms/zipSeries .zipSeries
 	$ cd .zipSeries
 	$ bash install.sh
-	$ [[ -f ~/.bashrc ]] && source ~/.bashrc 
+	$ [[ -f ~/.bashrc ]] && source ~/.bashrc
 	$ [[ -f ~/.zshrc ]] && source ~/.zshrc
 
 See install help:

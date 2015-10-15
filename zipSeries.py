@@ -96,6 +96,11 @@ def main():
 		metavar='',
 		help='save OS/400 savfile locally all --target-* options will ignored'
 	)
+	source_group.add_argument('--source-job-log-file',
+		dest='s_job_log_file',
+		metavar='',
+		help='save source servers job log to a file'
+	)
 
 	# Target
 	target_group.add_argument('--target-release',
@@ -139,8 +144,25 @@ def main():
 		metavar='',
 		help='command to run when object(s) / library is restored on target machine'
 	)
+	target_group.add_argument('--target-job-log-file',
+		dest='t_job_log_file',
+		metavar='',
+		help='save target servers job log to a file'
+	)
 
 	# General
+	general_group.add_argument('--source-job-log',
+		dest='s_job_log',
+		action='store_true',
+		default=False,
+		help='display source servers job log'
+	)
+	general_group.add_argument('--target-job-log',
+		dest='t_job_log',
+		action='store_true',
+		default=False,
+		help='display target servers job log'
+	)
 	general_group.add_argument('--no-prompt',
 		dest='no_prompt',
 		action='store_true',
@@ -190,8 +212,8 @@ def main():
 	config = {
 		# when verbose is True zipSeries will print information about the programs workfow
 		'no-prompt': args.no_prompt,
-		'trace': args.no_prompt == False and args.trace,
-		'verbose': args.no_prompt == False and (args.verbose or args.trace),
+		'trace': args.silent == False and args.trace,
+		'verbose': args.silent == False and (args.verbose or args.trace),
 		'silent': args.silent,
 		'source': {
 			'svr': args.s_svr,
@@ -200,7 +222,9 @@ def main():
 			'lib': args.s_lib,
 			'obj': args.s_obj if args.s_obj != None and len(args.s_obj) else None, # (optional)
 			'obj-type': args.s_obj_type if args.s_obj_type != None and len(args.s_obj_type) else None,
-			'save-file': args.s_save_file
+			'save-file': args.s_save_file,
+			'job-log': args.s_job_log,
+			'job-log-file': args.s_job_log_file
 		},
 		'target': {
 			'release': args.t_release,
@@ -209,7 +233,9 @@ def main():
 			'pwd': args.t_pwd, # (optional - will prompt when needed)
 			'lib': args.t_lib,
 			'save-file': args.t_save_file,
-			'restore_cmd': args.t_restore_cmd
+			'restore_cmd': args.t_restore_cmd,
+			'job-log': args.t_job_log,
+			'job-log-file': args.t_job_log_file
 		}
 	}
 

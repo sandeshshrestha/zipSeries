@@ -65,11 +65,23 @@ def create_timestamp():
 	return datetime.datetime.fromtimestamp(time.time()).strftime('%-m/%-d/%Y %-I:%-M:%-S %p').upper()
 
 class AS400:
+	contexts = {
+		"NONE": 0,
+		"SAVE": 10,
+		"RESTORE": 20
+	}
 	def __init__(self, config):
 		self.source = config['source']
 		self.target = config['target']
 		self.save_file = None
 		self.config = config
+
+		self.context = AS400.contexts['NONE']
+		
+		_uuid = str(uuid.uuid1())
+		self.uuid = 'zipSeries-' + _uuid
+		self.save_uuid = 'zipSeries-save-' + _uuid
+		self.restore_uuid = 'zipSeries-restore-' + _uuid
 
 	def cl(self, cmd_name, data={}, quote=[]):
 
@@ -85,20 +97,57 @@ class AS400:
 
 		cmd = cmd.strip()
 
-		if self.config['trace']:
-			print('zipSeries: running iSeries (AS/400) command: ' + cmd)
+		self.println('running iSeries (AS/400) command: ' + cmd, trace=True)
 
 		return cmd
 
-	def __dspjoblog(self, ftp):
-		ftp.voidcmd('RCMD ' + self.cl('dspjoblog'))
-		ftp.voidcmd('RCMD ' + self.cl('crtpf'))
-		ftp.voidcmd('RCMD ' + self.cl('cpysplf'))
+	def println(self, msg, error=False, verbose=False, trace=False):
+
+		if (not verbose or self.config['verbose']) and (not trace or self.config['trace']):
+			
+			if self.context == self.contexts['SAVE']:
+				prefix = 'zipSeries: save: '
+			if self.context == self.contexts['RESTORE']:
+				prefix = 'zipSeries: restore: '
+			else:
+				prefix = 'zipSeries: '
+			
+			if not error:
+				print(prefix + msg)
+			else:
+				sys.stderr.write(prefix + 'error: ' + msg + '\n')
+
+	def __getjoblog(self, ftp):
+
+		as_ifs_job_log = self.uuid + '.joblog'
+
+		if self.context == self.contexts['SAVE']:
+			job_log_file = self.source['job-log-file'] if self.source['job-log-file'] else '/tmp/' + self.save_uuid + '.joblog' 
+		elif self.context == self.contexts['RESTORE']:
+			job_log_file = self.target['job-log-file'] if self.target['job-log-file'] else '/tmp/' + self.restore_uuid + '.joblog' 
+
+		if job_log_file == None:
+			raise Exception('no job_log_file defined')
+
+		for cmd in self.cl('dspjoblog').splitlines():
+			ftp.voidcmd('RCMD ' + cmd)
+
 		ftp.voidcmd('RCMD ' + self.cl('cpytostmf', {
-			'frommbr': '/QSYS.LIB/QTEMP.LIB/ZS_ERR.FILE/ZS_ERR.MBR',
-			'tostmf': 'zs_' + str(uuid.uuid1()),
+			'frommbr': '/QSYS.LIB/QTEMP.LIB/JOBLOG.FILE/JOBLOG.MBR',
+			'tostmf': '/tmp/' + as_ifs_job_log,
 			'stmfccsid': '1208'
-		}, quote=['frommbr', 'tostmf']))	
+		}, quote=['frommbr', 'tostmf']))
+
+		with open(job_log_file, 'wb') as f:
+			ftp.retrbinary('RETR /tmp/' + as_ifs_job_log, f.write)
+
+		return job_log_file
+
+	def __dspjoblog(self, error=False, source=False, target=False):
+		if (not source or self.source['job-log']) and (not target or self.target['job-log']):
+			with open(self.source['job-log-file']) as f:
+				for line in f:
+					self.println(line.rstrip('\n'), error=error)
 
 	def __parse_ascii(self, ascii):
 		meta = {
@@ -123,84 +172,6 @@ class AS400:
 		}
 
 		return meta
-
-	def __create_save_file(self, root_dir):
-		as_ifs_save_file = 'zipSeries-' + str(uuid.uuid1()) + '.savf'
-		tmp_file = os.path.join(root_dir, 'filetmp')
-
-		try:
-			if self.config['verbose']:
-				print('zipSeries: connection to ' + self.source['svr'])
-
-			ftp = FTP(self.source['svr'])
-
-			ftp.set_pasv(True)
-			ftp.set_debuglevel(0)
-
-			ftp.login(user=self.source['usr'], passwd=self.source['pwd'])
-
-			if self.config['verbose']:
-				print('zipSeries: connected to ' + self.source['svr'])
-
-			try:
-				ftp.voidcmd('site namefmt 1')
-
-				if self.config['verbose']:
-					print('zipSeries: creating savefile')
-				ftp.voidcmd('RCMD ' + self.cl('crtsavf'))
-
-				if self.source['obj'] == None:
-					if self.config['verbose']:
-						print('zipSeries: saving library to savefile')
-					ftp.voidcmd('RCMD ' + self.cl('savlib', {
-						'lib': self.source['lib'],
-						'release': self.target['release']
-					}))
-				else:
-					if self.config['verbose']:
-						print('zipSeries: saving object(s) to savefile')
-					ftp.voidcmd('RCMD ' + self.cl('savobj', {
-						'obj': ' '.join(self.source['obj']),
-						'objtype': ' '.join(self.source['obj-type']),
-						'lib': self.source['lib'],
-						'release': self.target['release']
-					}))
-
-				if self.config['verbose']:
-					print('zipSeries: copying save file to streamfile')
-
-				ftp.voidcmd('RCMD ' + self.cl('cpytostmf', {
-					'frommbr': '/QSYS.LIB/QTEMP.LIB/ZS.FILE',
-					'tostmf': '/tmp/' + as_ifs_save_file,
-					'stmfccsid': '*STMF'
-				}, quote=['frommbr', 'tostmf']))
-
-				if self.config['verbose']:
-					print('zipSeries: downloading streamfile')
-
-				with open(tmp_file, 'wb') as f:
-					ftp.retrbinary('RETR /tmp/' + as_ifs_save_file, f.write)
-
-			except Exception as e:
-				sys.stderr.write('zipSeries: error: ' + str(e) + '\n')
-				sys.stderr.write('zipSeries: JOBLOG: \n')
-
-				# TODO display job log
-				sys.exit(1)
-				self.__dspjoblog(ftp);
-				ftp.quit()
-				sys.exit(1)
-
-		except Exception as e:
-			sys.stderr.write('zipSeries: error: ' + str(e) + '\n')
-			sys.exit(1)
-
-		try:
-			ftp.quit()
-		except Exception as e:
-			pass
-
-		return tmp_file
 
 	def __create_ascii(self, tmp_file):
 
@@ -236,72 +207,141 @@ class AS400:
 		)
 
 	def save(self):
+		self.context = AS400.contexts['SAVE']
 		# save_file is the file which the AS/400 library / object should be saved to
-		self.save_file = ('/tmp/zipSeries-' + str(uuid.uuid1()) + '.4zs') if self.source['save-file'] == None else self.source['save-file']
+		self.save_file = (self.save_uuid + '.4zs') if self.source['save-file'] == None else self.source['save-file']
 
-		root_dir = '/tmp/zipSeries-' + str(uuid.uuid1());
+		root_dir = '/tmp/' + self.save_uuid;
 
 		os.mkdir(root_dir)
 
-		tmp_file = self.__create_save_file(root_dir)
-		ascii = self.__create_ascii(os.path.join(root_dir, tmp_file))
+		as_ifs_save_file = self.save_uuid + '.savf'
+		tmp_file = os.path.join(root_dir, 'file.tmp')
 
-		with open(os.path.join(root_dir, INFO_FILE), 'wb') as f:
-			f.write(binascii.unhexlify(ascii))
+		exit = 0
 
-		if self.config['verbose']:
-			print('zipSeries: creating zip file')
-		zip = zipfile.ZipFile(self.save_file, 'w')
+		try:
+			self.println('connection to ' + self.source['svr'], verbose=True)
 
-		if self.config['trace']:
-			print('zipSeries: zip: adding file ' + tmp_file)
-		zip.write(tmp_file, os.path.basename(tmp_file))
+			ftp = FTP(self.source['svr'])
 
-		if self.config['trace']:
-			print('zipSeries: zip: adding file ' + os.path.join(root_dir, INFO_FILE))
-		zip.write(os.path.join(root_dir, INFO_FILE), INFO_FILE)
+			ftp.set_pasv(True)
+			ftp.set_debuglevel(0)
 
-		zip.close()
+			ftp.login(user=self.source['usr'], passwd=self.source['pwd'])
 
-		if self.config['verbose']:
-			print('zipSeries: cleaning up...')
+			self.println('connected to ' + self.source['svr'], verbose=True)
 
-		if self.config['trace']:
-			print('zipSeries: removing ' + tmp_file)
-		os.remove(tmp_file)
+			try:
+				ftp.voidcmd('site namefmt 1')
+				self.println('creating savefile', verbose=True)
+				ftp.voidcmd('RCMD ' + self.cl('crtsavf'))
 
-		if self.config['trace']:
-			print('zipSeries: removing ' + os.path.join(root_dir, INFO_FILE))
-		os.remove(os.path.join(root_dir, INFO_FILE))
+				if self.source['obj'] == None:
+					self.println('saving library to savefile', verbose=True)
+					ftp.voidcmd('RCMD ' + self.cl('savlib', {
+						'lib': self.source['lib'],
+						'release': self.target['release']
+					}))
+				else:
+					self.println('saving object(s) to savefile', verbose=True)
+					ftp.voidcmd('RCMD ' + self.cl('savobj', {
+						'obj': ' '.join(self.source['obj']),
+						'objtype': ' '.join(self.source['obj-type']),
+						'lib': self.source['lib'],
+						'release': self.target['release']
+					}))
 
-		if self.config['trace']:
-			print('zipSeries: removing ' + root_dir)
-		os.rmdir(root_dir)
+				self.println('copying save file to streamfile', verbose=True)
+				ftp.voidcmd('RCMD ' + self.cl('cpytostmf', {
+					'frommbr': '/QSYS.LIB/QTEMP.LIB/ZS.FILE',
+					'tostmf': '/tmp/' + as_ifs_save_file,
+					'stmfccsid': '*STMF'
+				}, quote=['frommbr', 'tostmf']))
 
-		if self.config['verbose']:
-			print('zipSeries: done')
+				self.println('downloading streamfile', verbose=True)
+
+				with open(tmp_file, 'wb') as f:
+					ftp.retrbinary('RETR /tmp/' + as_ifs_save_file, f.write)
+
+				ftp.delete('/tmp/' + as_ifs_save_file)
+		
+			except Exception as e:
+				self.println(str(e), error=True)
+				exit = 1
+
+		except Exception as e:
+			self.println(str(e))
+			exit = 1
+		
+		self.__getjoblog(ftp)
+		ftp.quit()
+
+		if exit == 0:
+			ascii = self.__create_ascii(os.path.join(root_dir, tmp_file))
+
+			with open(os.path.join(root_dir, INFO_FILE), 'wb') as f:
+				f.write(binascii.unhexlify(ascii))
+
+			self.println('creating zip file', verbose=True)
+			zip = zipfile.ZipFile(self.save_file, 'w')
+			self.println('zip: adding file ' + tmp_file, trace=True)
+			zip.write(tmp_file, os.path.basename(tmp_file))
+			self.println('zip: adding file ' + os.path.join(root_dir, INFO_FILE), trace=True)
+			zip.write(os.path.join(root_dir, INFO_FILE), INFO_FILE)
+
+			zip.close()
+
+		# Remove temp files / directories
+		self.println('cleaning up...', verbose=True)
+
+		self.println('removing ' + tmp_file, trace=True)
+		try:
+			os.remove(tmp_file)
+		except Exception as e:
+			pass
+
+		self.println('removing ' + os.path.join(root_dir, INFO_FILE), trace=True)
+		try:
+			os.remove(os.path.join(root_dir, INFO_FILE))
+		except Exception as e:
+			pass
+
+		self.println('removing ' + root_dir, trace=True)
+		try:
+			os.rmdir(root_dir)
+		except Exception as e:
+			pass
+
+		if exit == 0:
+			self.println('done', verbose=True)
+			self.__dspjoblog(source=True)
+			self.context = AS400.contexts['NONE']
+		else:
+			self.__dspjoblog(error=True)
+			self.context = AS400.contexts['NONE']
+			sys.exit(exit)
 
 	def restore(self, save_file=None):
+		self.context = AS400.contexts['RESTORE']
 		# save_file should be restored on the AS/400
 		if save_file == None:
 			save_file = self.save_file
 
-		root_dir = '/tmp/zipSeries-' + str(uuid.uuid1());
+		root_dir = '/tmp/' + self.restore_uuid;
 
 		unzip_file(save_file, dest=root_dir)
 
-		if self.config['verbose']:
-			print('zipSeries: unzipping \'' + save_file + '\' to \'' + root_dir + '\'')
+		self.println('unzipping \'' + save_file + '\' to \'' + root_dir + '\'', verbose=True)
 
 		meta = self.__parse_ascii(list(read_file_ascii(os.path.join(root_dir,  INFO_FILE))))
-
 		meta['restore_file'] = glob.glob(root_dir + '/*.tmp')[0]
+		as_ifs_save_file = '/tmp/' + self.restore_uuid + '.savf'
 
-		as_ifs_save_file = '/tmp/zipSeries-' + str(uuid.uuid1()) + '.savf'
+		exit = 0
 
 		try:
-			if self.config['verbose']:
-				print('zipSeries: connection to ' + self.target['svr'])
+			self.println('connection to ' + self.target['svr'], verbose=True)
 
 			ftp = FTP(self.target['svr'])
 
@@ -310,8 +350,7 @@ class AS400:
 
 			ftp.login(user=self.target['usr'], passwd=self.target['pwd'])
 
-			if self.config['verbose']:
-				print('zipSeries: connected to ' + self.target['svr'])
+			self.println('connected to ' + self.target['svr'], verbose=True)
 
 			try:
 				ftp.voidcmd('site namefmt 1')
@@ -338,25 +377,33 @@ class AS400:
 
 				# Run restore command if specified
 				if meta['restore_cmd'] != '':
-					if self.config['verbose']:
-						print('zipSeries: running iSeries (AS/400) restore command: ' + meta['restore_cmd'])
-						ftp.voidcmd('RCMD ' + meta['restore_cmd'])
+					self.println('running iSeries (AS/400) restore command: ' + meta['restore_cmd'], verbose=True)
+					ftp.voidcmd('RCMD ' + meta['restore_cmd'])
 
 			except Exception as e:
-				sys.stderr.write('zipSeries: error: ' + str(e) + '\n')
-				sys.stderr.write('zipSeries: JOBLOG: \n')
-
-				# TODO display job log
-				sys.exit(1)
-				self.__dspjoblog(ftp)	
-				ftp.quit()
-				sys.exit(1)
+				self.println(str(e), error=True)
+				exit = 1
 
 		except Exception as e:
-			sys.stderr.write('zipSeries: error: ' + str(e) + '\n')
-			sys.exit(1)
+			self.println(str(e), error=True)
+			exit = 1
 
+		self.__getjoblog(ftp)
+		ftp.quit()
+
+		# Remove temp files / directories
+		self.println('cleaning up...', verbose=True)
+
+		self.println('removing ' + root_dir, trace=True)
 		try:
-			ftp.quit()
+			os.remove(root_dir)
 		except Exception as e:
 			pass
+
+		if exit == 0: 
+			self.println('done', verbose=True)
+			self.context = AS400.contexts['NONE']
+			self.__dspjoblog(target=True)
+		else:
+			self.context = AS400.contexts['NONE']
+			sys.exit(exit)

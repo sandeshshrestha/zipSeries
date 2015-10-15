@@ -76,6 +76,9 @@ class AS400:
 		self.save_file = None
 		self.config = config
 
+		self.save_cleanup_job_log_file = False
+		self.restore_cleanup_job_log_file = False
+		
 		self.context = AS400.contexts['NONE']
 		
 		_uuid = str(uuid.uuid1())
@@ -122,9 +125,17 @@ class AS400:
 		as_ifs_job_log = self.uuid + '.joblog'
 
 		if self.context == self.contexts['SAVE']:
-			job_log_file = self.source['job-log-file'] if self.source['job-log-file'] else '/tmp/' + self.save_uuid + '.joblog' 
+			job_log_file = self.source['job-log-file']
+			if self.source['job-log-file'] == None:
+				job_log_file = '/tmp/' + self.save_uuid + '.joblog'
+				self.source['job-log-file'] = job_log_file
+				self.save_cleanup_job_log_file = True
 		elif self.context == self.contexts['RESTORE']:
-			job_log_file = self.target['job-log-file'] if self.target['job-log-file'] else '/tmp/' + self.restore_uuid + '.joblog' 
+			job_log_file = self.target['job-log-file']
+			if self.target['job-log-file'] == None:
+				job_log_file = '/tmp/' + self.restore_uuid + '.joblog' 
+				self.target['job-log-file'] = job_log_file
+				self.restore_cleanup_job_log_file = True
 
 		if job_log_file == None:
 			raise Exception('no job_log_file defined')
@@ -145,7 +156,12 @@ class AS400:
 
 	def __dspjoblog(self, error=False, source=False, target=False):
 		if (not source or self.source['job-log']) and (not target or self.target['job-log']):
-			with open(self.source['job-log-file']) as f:
+			if self.context == self.contexts['SAVE']:
+				job_log_file = self.source['job-log-file'] if self.source['job-log-file'] else '/tmp/' + self.save_uuid + '.joblog'
+			elif self.context == self.contexts['RESTORE']:
+				job_log_file = self.target['job-log-file'] if self.target['job-log-file'] else '/tmp/' + self.restore_uuid + '.joblog' 
+
+			with open(job_log_file) as f:
 				for line in f:
 					self.println(line.rstrip('\n'), error=error)
 
@@ -320,6 +336,15 @@ class AS400:
 		else:
 			self.__dspjoblog(error=True)
 			self.context = AS400.contexts['NONE']
+
+		if self.save_cleanup_job_log_file:
+			self.println('removing ' + self.source['job-log-file'], trace=True)
+			try:
+				os.remove(self.source['job-log-file'])
+			except Exception as e:
+				pass
+
+		if exit != 0:
 			sys.exit(exit)
 
 	def restore(self, save_file=None):
@@ -406,4 +431,14 @@ class AS400:
 			self.__dspjoblog(target=True)
 		else:
 			self.context = AS400.contexts['NONE']
+		
+		if self.restore_cleanup_job_log_file:
+			self.println('removing ' + self.target['job-log-file'], trace=True)
+			try:
+				os.remove(self.target['job-log-file'])
+			except Exception as e:
+				pass
+
+		if exit != 0:
 			sys.exit(exit)
+

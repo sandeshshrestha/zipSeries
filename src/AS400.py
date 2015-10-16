@@ -225,7 +225,7 @@ class AS400:
 	def save(self):
 		self.context = AS400.contexts['SAVE']
 		# save_file is the file which the AS/400 library / object should be saved to
-		self.save_file = (self.save_uuid + '.4zs') if self.source['save-file'] == None else self.source['save-file']
+		self.save_file = ('/tmp/' + self.save_uuid + '.4zs') if self.source['save-file'] == None else self.source['save-file']
 
 		root_dir = '/tmp/' + self.save_uuid;
 

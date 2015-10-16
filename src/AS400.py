@@ -287,7 +287,7 @@ class AS400:
 				exit = 1
 
 		except Exception as e:
-			self.println(str(e))
+			self.println(str(e), error=True)
 			exit = 1
 		
 		self.__getjoblog(ftp)

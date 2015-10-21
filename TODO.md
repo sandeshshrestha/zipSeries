@@ -15,6 +15,7 @@
 ## Version 1.4
 - [ ] Support pre restore command
 - [ ] Support multiply libraries
-- [ ] Add option `--source-backup-save-file` and `--target-save-file` that will take a backup of the current objects / libraries before restoring
-- [ ] Add option `--job-log` as an alias for `--source-job-log --target-job-log`
-- [ ] Add option `--job-log-file $file` as an alias for `--source-job-log-file $file --target-job-log-file $file`
+- [ ] Add option `--source-backup-save-file` and `--target-backup-save-file` that will take a backup of the current objects / libraries before restoring
+   - the save file should support the wildcard `%d` or `%n` that will create files named: where `--*-backup-save-file backup-%n.4zs` will create `backup-1.4zs`, `backup-2.4zs`, ... and where `--*-backup-save-file backup-%d.4zs` will create `backup-$(date +%Y-%m-%d-%H-%M-%S)`, eg. `backup-2015-10-21-22-37-05.4zs`
+- [x] Add option `--job-log` as an alias for `--source-job-log --target-job-log`
+- [x] Add option `--job-log-file $file` as an alias for `--source-job-log-file $file --target-job-log-file $file`

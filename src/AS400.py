@@ -37,7 +37,7 @@ def read_ascii(ascii, i, type='str', trace=False):
 		ret = ret.strip()
 
 	if trace:
-		print('zipSeries: parsing config: ' + ret)
+		print('zipSeries: parsing config: ' + str(ret))
 
 	return ret
 

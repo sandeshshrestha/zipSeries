@@ -79,7 +79,7 @@ Install
 	$ cd ~
 	$ git clone ssh://github.com/ginkoms/zipSeries .zipSeries
 	$ cd .zipSeries
-	$ bash install.sh
+	$ bash install.sh --home $HOME
 	$ [[ -f ~/.bashrc ]] && source ~/.bashrc
 	$ [[ -f ~/.zshrc ]] && source ~/.zshrc
 
@@ -91,6 +91,7 @@ See install help:
 	usage: install.sh [--help] | [OPTION]...
 	Install zipSeries CLI on your machine
 
+	      --home           set home directory, defaults to '~'
 	      --nosymlink      dont create a symlink in the folder ~/bin
 	      --norc           dont add code to ~/.bashrc and ~/.zshrc
 	      --nocfg          dont create the folder /etc/zipSeries

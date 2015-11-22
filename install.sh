@@ -3,6 +3,7 @@ bash_dirname=$(cd "$(dirname ${BASH_SOURCE[0]})";pwd)
 old_dir=$PWD
 cd $bash_dirname;
 
+home=~;
 nosymlink=false
 norc=false
 nocfg=false
@@ -17,6 +18,8 @@ while (($#)); do
 			echo 'usage: '$pgm' [--help] | [OPTION]...'
 			echo 'Install zipSeries CLI on your machine'
 			echo ''
+			echo '      --home           set home directory, defaults to '"'~'"''
+			echo ''
 			echo '      --nosymlink      dont create a symlink in the folder ~/bin'
 			echo '      --norc           dont add code to ~/.bashrc and ~/.zshrc'
 			echo '      --nocfg          dont create the folder /etc/zipSeries'
@@ -24,6 +27,7 @@ while (($#)); do
 			echo '      --help           display this help and exit'
 			exit 0
 			;;
+		--home ) home=$2;shift;;
 		--nosymlink ) nosymlink=true;;
 		--norc ) norc=true;;
 		--nocfg ) nocfg=true;;
@@ -43,15 +47,15 @@ if [[ "$EUID" -ne 0 && "$noroot" = false ]]; then
 fi
 
 if [ "$nosymlink" = false ]; then
-	echo $pgm: creating if not exists ~/bin
-	mkdir -p ~/bin
+	echo $pgm: creating if not exists $home/bin
+	mkdir -p $home/bin
 
 	# Remove old zipSeries
-	[[ -f ~/bin/zipSeries ]] && echo $pgm: removing ~/bin/zipSeries && rm ~/bin/zipSeries
+	[[ -f $home/bin/zipSeries ]] && echo $pgm: removing $home/bin/zipSeries && rm $home/bin/zipSeries
 
-	link="$(cd ~/bin;pwd)/zipSeries"
+	link="$(cd $home/bin;pwd)/zipSeries"
 	target="$bash_dirname/zipSeries.py"
-	link2="$(cd ~/bin;pwd)/zipSeriesPrompt"
+	link2="$(cd $home/bin;pwd)/zipSeriesPrompt"
 	target2="$bash_dirname/zipSeriesPrompt.pl"
 
 	# Remove current link so we can handle updates
@@ -85,16 +89,16 @@ if [ "$nosymlink" = false ]; then
 fi
 
 if [ "$norc" = false ]; then
-	if [[ -f ~/.bashrc ]]; then
-		echo "$pgm: adding \"source $bash_dirname/.bashrc\" to ~/.bashrc"
-		echo '#Added by ZipSeries:' >> ~/.bashrc
-		echo "[[ -f \"$bash_dirname/.bashrc\" ]] && source \"$bash_dirname/.bashrc\"" >> ~/.bashrc
+	if [[ -f $home/.bashrc ]]; then
+		echo "$pgm: adding \"source $bash_dirname/.bashrc\" to $home/.bashrc"
+		echo '#Added by ZipSeries:' >> $home/.bashrc
+		echo "[[ -f \"$bash_dirname/.bashrc\" ]] && source \"$bash_dirname/.bashrc\"" >> $home/.bashrc
 	fi
 
-	if [[ -f ~/.zshrc ]]; then
-		echo "$pgm: adding \"source $bash_dirname/.zshrc\" to ~/.zshrc"
-		echo '#Added by ZipSeries:' >> ~/.zshrc
-		echo "[[ -f \"$bash_dirname/.zshrc\" ]] && source \"$bash_dirname/.zshrc\"" >> ~/.zshrc
+	if [[ -f $home/.zshrc ]]; then
+		echo "$pgm: adding \"source $bash_dirname/.zshrc\" to $home/.zshrc"
+		echo '#Added by ZipSeries:' >> $home/.zshrc
+		echo "[[ -f \"$bash_dirname/.zshrc\" ]] && source \"$bash_dirname/.zshrc\"" >> $home/.zshrc
 	fi
 fi
 

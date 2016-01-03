@@ -28,7 +28,7 @@ main();
 sub get_possible_zs_args {
 
 	my %args;
-	open my $fh_help, "$zipSeries --help |" or die $!;
+	open my $fh_help, "-|", "$zipSeries --help" or die $!;
 	while (<$fh_help>) {
 		last if (m/^\s*options:\s*$/);
 		

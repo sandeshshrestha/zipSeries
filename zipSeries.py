@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python2
 
 # zipSeries 1.3.0
 # Copyright (C) 2015 System & Method A/S Denmark

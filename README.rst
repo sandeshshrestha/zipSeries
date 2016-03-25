@@ -77,7 +77,7 @@ Install
 .. code-block:: bash
 
 	$ cd ~
-	$ git clone ssh://github.com/ginkoms/zipSeries .zipSeries
+	$ git clone https://github.com/andlrc/zipSeries ~/.zipSeries
 	$ cd .zipSeries
 	$ bash install.sh --home $HOME
 	$ [[ -f ~/.bashrc ]] && source ~/.bashrc

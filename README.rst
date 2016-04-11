@@ -79,7 +79,7 @@ Install
 	$ cd ~
 	$ git clone https://github.com/andlrc/zipSeries ~/.zipSeries
 	$ cd .zipSeries
-	$ echo 'PATH="$PATH:$HOME/.zipSeries/bin" >> ~/.bashrc'
+	$ echo 'PATH="$PATH:$HOME/.zipSeries" >> ~/.bashrc'
 
 Usage
 =====
